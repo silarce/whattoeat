@@ -11,7 +11,7 @@ import { useWheel } from "@/hooks/use-wheel";
 import { useFavorites } from "@/hooks/use-favorites";
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
-import { WinnerCard } from "@/components/winner-card";
+import { showWinnerCard } from "@/lib/show-winner-card";
 import { RestaurantList } from "@/components/restaurant-list";
 import { MapSection } from "@/components/map-section";
 import { FavoritesSection } from "@/components/favorites-section";
@@ -28,7 +28,6 @@ export default function Home() {
   const [status, setStatus] = useState("定位中…");
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
-  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
   const [band, setBand] = useState<DistanceBandKey>("near");
 
   // 掛載後自動定位
@@ -164,20 +163,19 @@ export default function Home() {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
       setStatus(`你選擇了：${restaurant.name}`);
-      setIsWinnerModalOpen(true);
+      showWinnerCard({
+        winner: restaurant,
+        checkIsFavorite: () => favs.isFavorite(restaurant.id),
+        onAddFavorite: () => favs.add(restaurant),
+        onViewOnMap: () => setMapTarget(restaurant),
+      });
     },
-    [wheel],
+    [wheel, favs],
   );
 
   const handleViewOnMap = useCallback((restaurant: Restaurant | FavoriteRestaurant) => {
     setMapTarget(restaurant as Restaurant);
   }, []);
-
-  const handleAddFavoriteFromWinner = useCallback(async () => {
-    if (wheel.winner) {
-      await favs.add(wheel.winner);
-    }
-  }, [wheel.winner, favs]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -197,18 +195,6 @@ export default function Home() {
           isOpen={geo.permissionDenied}
           onClose={geo.clearPermissionDenied}
           onRetry={geo.locate}
-        />
-
-        {/* Winner Modal */}
-        <WinnerCard
-          winner={wheel.winner}
-          isFavorite={wheel.winner ? favs.isFavorite(wheel.winner.id) : false}
-          isOpen={isWinnerModalOpen}
-          onClose={() => setIsWinnerModalOpen(false)}
-          onAddFavorite={handleAddFavoriteFromWinner}
-          onViewOnMap={() => {
-            if (wheel.winner) handleViewOnMap(wheel.winner);
-          }}
         />
 
         {/* Main 2-column layout */}
