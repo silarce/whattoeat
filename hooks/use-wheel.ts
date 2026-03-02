@@ -22,7 +22,7 @@ type WheelState = {
 export function useWheel() {
   const [state, setState] = useState<WheelState>({
     items: [],
-    selectedIndex: 0,
+    selectedIndex: -1,
     isSpinning: false,
     winner: null,
   });
@@ -33,7 +33,7 @@ export function useWheel() {
     const picked = pickRandom(restaurants, MAX_WHEEL_ITEMS);
     setState({
       items: picked,
-      selectedIndex: 0,
+      selectedIndex: -1,
       isSpinning: false,
       winner: null,
     });
