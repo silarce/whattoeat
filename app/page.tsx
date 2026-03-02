@@ -12,9 +12,8 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
 import { showWinnerCard } from "@/lib/show-winner-card";
-import { RestaurantList } from "@/components/restaurant-list";
 import { MapSection } from "@/components/map-section";
-import { FavoritesSection } from "@/components/favorites-section";
+import { SidePanel } from "@/components/side-panel";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 
 export default function Home() {
@@ -229,7 +228,7 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2">
-            <RestaurantList
+            <SidePanel
               totalCount={searchHook.restaurants.length}
               pagedRestaurants={searchHook.pagedRestaurants}
               page={searchHook.page}
@@ -240,16 +239,12 @@ export default function Home() {
               onToggleWheel={handleToggleWheel}
               onSelect={handleSelectRestaurant}
               onViewOnMap={handleViewOnMap}
+              favorites={favs.favorites}
+              onAddToWheel={wheel.addItem}
+              onRemoveFavorite={favs.remove}
             />
           </div>
         </div>
-
-        <FavoritesSection
-          favorites={favs.favorites}
-          onAddToWheel={wheel.addItem}
-          onViewOnMap={handleViewOnMap}
-          onRemove={favs.remove}
-        />
       </main>
     </div>
   );
