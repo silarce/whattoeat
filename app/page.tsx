@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
@@ -176,6 +176,16 @@ export default function Home() {
   const handleViewOnMap = useCallback((restaurant: Restaurant | FavoriteRestaurant) => {
     setMapTarget(restaurant as Restaurant);
   }, []);
+
+  // 偵測轉盤從「旋轉中」→「停止且有贏家」的時機，呼叫 handleSelectRestaurant
+  const prevIsSpinningRef = useRef(false);
+  useEffect(() => {
+    const wasSpinning = prevIsSpinningRef.current;
+    prevIsSpinningRef.current = wheel.isSpinning;
+    if (wasSpinning && !wheel.isSpinning && wheel.winner) {
+      handleSelectRestaurant(wheel.winner);
+    }
+  }, [wheel.isSpinning, wheel.winner, handleSelectRestaurant]);
 
   return (
     <div className="min-h-screen bg-gray-50">
