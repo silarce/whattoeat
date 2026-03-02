@@ -2,16 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SEARCH_RADII } from "@/lib/constants";
+import { DISTANCE_BANDS, type DistanceBandKey } from "@/lib/constants";
 
 type HeaderProps = {
   status: string;
   isLocating: boolean;
   isSearching: boolean;
   hasLocation: boolean;
-  radius: number;
+  band: DistanceBandKey;
   onLocate: () => void;
-  onRadiusChange: (radius: number) => void;
+  onBandChange: (band: DistanceBandKey) => void;
 };
 
 export function Header({
@@ -19,9 +19,9 @@ export function Header({
   isLocating,
   isSearching,
   hasLocation,
-  radius,
+  band,
   onLocate,
-  onRadiusChange,
+  onBandChange,
 }: HeaderProps) {
   return (
     <header className="border-b border-gray-100 bg-white">
@@ -34,23 +34,24 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 flex-col gap-3 sm:items-end">
-          {/* Radius selector + Locate button */}
+          {/* Band selector + Locate button */}
           <div className="flex items-center gap-2">
             <span className="text-base font-medium text-gray-700">搜尋餐廳</span>
             <div className="flex rounded-lg border border-gray-200 p-0.5">
-              {SEARCH_RADII.map((r) => (
+              {DISTANCE_BANDS.map((b) => (
                 <button
-                  key={r}
+                  key={b.key}
                   type="button"
-                  onClick={() => onRadiusChange(r)}
+                  onClick={() => onBandChange(b.key)}
+                  disabled={!hasLocation || isSearching}
                   className={cn(
                     "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                    radius === r
+                    band === b.key
                       ? "bg-orange-500 text-white"
                       : "text-gray-600 hover:bg-gray-100",
                   )}
                 >
-                  {r}m
+                  {b.label}
                 </button>
               ))}
             </div>

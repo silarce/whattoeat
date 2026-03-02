@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import type { Restaurant } from "@/types/restaurant";
 
@@ -23,11 +23,13 @@ export default function RestaurantMap({
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const locationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
 
-  // 以 ref 保存 callback，避免 effect 因 callback 變化而重跑
+  // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
+  const [mapReady, setMapReady] = useState(false);
+
   const onSelectRef = useRef(onSelectRestaurant);
   onSelectRef.current = onSelectRestaurant;
 
-  // 1) 初始化地圖 — 只在 apiKey 改變時執行一次
+  // 1) 初始化地圖
   useEffect(() => {
     if (!mapRef.current) return;
     let cancelled = false;
@@ -39,10 +41,11 @@ export default function RestaurantMap({
 
         mapsModuleRef.current = mapsModule;
 
-        // 如果地圖已存在，不重建
-        if (mapInstanceRef.current) return;
+        if (mapInstanceRef.current) {
+          setMapReady(true);
+          return;
+        }
 
-        // 確保 Google Maps 已完全載入
         if (!window.google?.maps) {
           console.error("Google Maps API not loaded");
           return;
@@ -54,11 +57,11 @@ export default function RestaurantMap({
           mapTypeControl: false,
           fullscreenControl: false,
           streetViewControl: false,
-          // AdvancedMarkerElement 必須提供 mapId，使用 Google 官方測試 ID
           mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
         });
 
         mapInstanceRef.current = map;
+        setMapReady(true);
       } catch (error) {
         console.error("Failed to load Google Maps:", error);
       }
@@ -67,71 +70,60 @@ export default function RestaurantMap({
     return () => {
       cancelled = true;
     };
-    // 只在 apiKey 變化時初始化，location 用於初始 center
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
 
-  // 2) location 改變 → 更新地圖中心與位置 marker
+  // 2) location 改變 or 地圖就緒 → 更新位置 marker
   useEffect(() => {
+    if (!mapReady) return;
     const map = mapInstanceRef.current;
     const mapsModule = mapsModuleRef.current;
     if (!map || !mapsModule) return;
 
     map.panTo({ lat: location.lat, lng: location.lng });
 
-    // 更新或建立位置 marker
     if (!mapsModule.marker?.AdvancedMarkerElement) {
-      console.warn("AdvancedMarkerElement not available, skipping location marker");
+      console.warn("AdvancedMarkerElement not available");
       return;
     }
 
     if (locationMarkerRef.current) {
-      locationMarkerRef.current.position = {
-        lat: location.lat,
-        lng: location.lng,
-      };
+      locationMarkerRef.current.position = { lat: location.lat, lng: location.lng };
     } else {
-      const markerElement = document.createElement("div");
-      markerElement.innerHTML =
+      const el = document.createElement("div");
+      el.innerHTML =
         '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#4A90E2" stroke="white" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="white"/></svg>';
       locationMarkerRef.current = new mapsModule.marker.AdvancedMarkerElement({
         position: { lat: location.lat, lng: location.lng },
         map,
         title: "目前位置",
-        content: markerElement,
+        content: el,
       });
     }
-  }, [location.lat, location.lng]);
+  }, [mapReady, location.lat, location.lng]);
 
-  // 3) 更新餐廳 markers — 只在 restaurants 陣列改變時
+  // 3) 更新餐廳 markers
   const updateMarkers = useCallback(() => {
     const map = mapInstanceRef.current;
     const mapsModule = mapsModuleRef.current;
     if (!map || !mapsModule) return;
 
-    // 清除舊的餐廳 markers
-    markersRef.current.forEach((m) => {
-      m.map = null;
-    });
+    markersRef.current.forEach((m) => { m.map = null; });
     markersRef.current = [];
+
+    if (!mapsModule.marker?.AdvancedMarkerElement) return;
 
     restaurants.forEach((restaurant) => {
       if (!restaurant.lat || !restaurant.lng) return;
 
-      // 禺量使用 AdvancedMarkerElement，需要確保 marker 庫已載入
-      if (!mapsModule.marker?.AdvancedMarkerElement) {
-        console.warn("AdvancedMarkerElement not available, skipping custom markers");
-        return;
-      }
-
-      const markerElement = document.createElement("div");
-      markerElement.innerHTML =
+      const el = document.createElement("div");
+      el.innerHTML =
         '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 16 12 16s12-9 12-16c0-6.63-5.37-12-12-12z" fill="#FF6B35" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
       const marker = new mapsModule.marker.AdvancedMarkerElement({
         position: { lat: restaurant.lat, lng: restaurant.lng },
         map,
         title: restaurant.name,
-        content: markerElement,
+        content: el,
       });
 
       marker.addEventListener("gmp-click", () => {
@@ -143,31 +135,26 @@ export default function RestaurantMap({
       markersRef.current.push(marker);
     });
 
-    // 自動調整邊界
     if (restaurants.length > 0) {
       const bounds = new mapsModule.LatLngBounds();
       bounds.extend({ lat: location.lat, lng: location.lng });
-
       markersRef.current.forEach((marker) => {
         const pos = marker.position;
         if (pos) bounds.extend(pos);
       });
-
       map.fitBounds(bounds, 50);
     }
   }, [restaurants, location.lat, location.lng]);
 
-  // 當 restaurants 改變時，用小延遲確保地圖完全初始化、markers 庫已載入
+  // 4) 地圖就緒 + restaurants 改變 → 更新 markers
   useEffect(() => {
-    if (!mapInstanceRef.current || !mapsModuleRef.current) return;
-
-    // 使用小延遲，確保地圖、maps module、markers 庫都就緒
+    if (!mapReady) return;
+    // 小延遲確保地圖 tiles 已載入
     const timer = setTimeout(() => {
       updateMarkers();
     }, 100);
-
     return () => clearTimeout(timer);
-  }, [restaurants, updateMarkers]);
+  }, [mapReady, restaurants, updateMarkers]);
 
   return (
     <div

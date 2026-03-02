@@ -2,7 +2,33 @@ import type { Restaurant } from "@/types/restaurant";
 import {
   PLACES_API_URL,
   PLACES_FIELD_MASK,
+  API_SEARCH_RADIUS,
 } from "@/lib/constants";
+
+// ---------------------------------------------------------------------------
+//  Haversine
+// ---------------------------------------------------------------------------
+
+/** Haversine 公式：計算兩個座標之間的距離（公尺）*/
+export function distanceInMeters(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const R = 6_371_000;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ---------------------------------------------------------------------------
+//  API Types
+// ---------------------------------------------------------------------------
 
 type PlaceResponse = {
   places?: Array<{
@@ -12,43 +38,17 @@ type PlaceResponse = {
     photos?: Array<{ name: string }>;
     location?: { latitude?: number; longitude?: number };
   }>;
+  nextPageToken?: string;
 };
 
-/**
- * 透過 Google Places API 搜尋指定半徑內的餐廳
- */
-async function fetchByRadius(
-  radius: number,
-  lat: number,
-  lng: number,
+// ---------------------------------------------------------------------------
+//  Internal helpers
+// ---------------------------------------------------------------------------
+
+function parsePlaces(
+  places: NonNullable<PlaceResponse["places"]>,
   apiKey: string,
-): Promise<Restaurant[]> {
-  const response = await fetch(PLACES_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Goog-Api-Key": apiKey,
-      "X-Goog-FieldMask": PLACES_FIELD_MASK,
-    },
-    body: JSON.stringify({
-      includedTypes: ["restaurant"],
-      maxResultCount: 20,
-      locationRestriction: {
-        circle: {
-          center: { latitude: lat, longitude: lng },
-          radius,
-        },
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`API_ERROR_${response.status}`);
-  }
-
-  const data = (await response.json()) as PlaceResponse;
-  const places = data.places ?? [];
-
+): Restaurant[] {
   return places
     .filter((place) => place.id && place.displayName?.text)
     .map((place) => {
@@ -68,18 +68,106 @@ async function fetchByRadius(
     });
 }
 
+// ---------------------------------------------------------------------------
+//  Internal helpers - API 搜尋
+// ---------------------------------------------------------------------------
+
+const SEARCH_QUERIES = ["餐廳", "飯", "麵"];
+
 /**
- * 搜尋附近餐廳 (單一半徑)
+ * 用單一關鍵字搜尋，支援多頁分頁
  */
-export async function searchNearbyRestaurants(
+async function searchByQuery(
+  query: string,
   lat: number,
   lng: number,
   apiKey: string,
-  radius = 100,
+  maxPages: number,
 ): Promise<Restaurant[]> {
-  const results = await fetchByRadius(radius, lat, lng, apiKey);
-  const uniqueMap = new Map(results.map((item) => [item.id, item]));
-  return Array.from(uniqueMap.values());
+  const results: Restaurant[] = [];
+  let pageToken: string | undefined;
+
+  for (let page = 0; page < maxPages; page++) {
+    const body: Record<string, unknown> = {
+      textQuery: query,
+      maxResultCount: 20,
+      locationBias: {
+        circle: {
+          center: { latitude: lat, longitude: lng },
+          radius: 5000,
+        },
+      },
+    };
+
+    if (pageToken) body.pageToken = pageToken;
+
+    const response = await fetch(PLACES_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": PLACES_FIELD_MASK,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      console.warn(`Failed to search "${query}": ${response.status}`);
+      break;
+    }
+
+    const data = (await response.json()) as PlaceResponse;
+    results.push(...parsePlaces(data.places ?? [], apiKey));
+
+    if (!data.nextPageToken) break;
+    pageToken = data.nextPageToken;
+  }
+
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+//  Public API
+// ---------------------------------------------------------------------------
+
+/**
+ * 用多個關鍵字並行搜尋所有餐廳（每個關鍵字最多 5 頁），合併去重結果。
+ * 搜尋結果會以 Haversine 過濾掉超出 API_SEARCH_RADIUS（1200m）的項目。
+ */
+export async function searchAllNearby(
+  lat: number,
+  lng: number,
+  apiKey: string,
+): Promise<Restaurant[]> {
+  // 並行搜尋所有關鍵字，加快速度
+  const searchPromises = SEARCH_QUERIES.map((query) =>
+    searchByQuery(query, lat, lng, apiKey, 5)
+  );
+
+  const resultsArray = await Promise.all(searchPromises);
+  const allRestaurants = resultsArray.flat();
+
+  // 去重 + 過濾到最大距離帶以內
+  const uniqueMap = new Map(allRestaurants.map((r) => [r.id, r]));
+  return Array.from(uniqueMap.values()).filter((r) => {
+    if (r.lat == null || r.lng == null) return false;
+    return distanceInMeters(lat, lng, r.lat, r.lng) <= API_SEARCH_RADIUS;
+  });
+}
+
+/**
+ * 從完整列表中挑出距離 <= maxMeters 的餐廳（client 端過濾）
+ */
+export function filterByDistance(
+  restaurants: Restaurant[],
+  lat: number,
+  lng: number,
+  maxMeters: number,
+): Restaurant[] {
+  return restaurants.filter((r) => {
+    if (r.lat == null || r.lng == null) return false;
+    return distanceInMeters(lat, lng, r.lat, r.lng) <= maxMeters;
+  });
 }
 
 /**

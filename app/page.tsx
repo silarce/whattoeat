@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
+import type { DistanceBandKey } from "@/lib/constants";
+import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
+import { filterByDistance } from "@/lib/places-api";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useRestaurantSearch } from "@/hooks/use-restaurant-search";
 import { useWheel } from "@/hooks/use-wheel";
 import { useFavorites } from "@/hooks/use-favorites";
-import { AUTO_SPIN_DELAY, MAX_WHEEL_ITEMS } from "@/lib/constants";
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
 import { WinnerCard } from "@/components/winner-card";
@@ -27,31 +29,31 @@ export default function Home() {
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
-  const [radius, setRadius] = useState(100);
+  const [band, setBand] = useState<DistanceBandKey>("near");
 
-  // 挂載後自動定位
+  // 掛載後自動定位
   useEffect(() => {
     geo.locate();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 定位成功且這是首次時，自動搜尋 100m 内的餐廳
+  // 定位成功且尚未搜尋時，自動搜尋一次
   useEffect(() => {
-    if (geo.location && searchHook.restaurants.length === 0 && !searchHook.isSearching) {
+    if (geo.location && searchHook.allRestaurants.length === 0 && !searchHook.isSearching) {
       const location = geo.location;
       (async () => {
         setStatus("搜尋附近餐廳中…");
-        const results = await searchHook.search(location, 100);
-        if (results.length === 0) {
-          setStatus("附近找不到餐廳，請改變半徑或位置");
+        const { filtered } = await searchHook.search(location);
+        if (filtered.length === 0) {
+          setStatus("附近找不到餐廳，試試切換距離帶");
           return;
         }
-        const picked = wheel.fillRandom(results);
+        wheel.fillRandom(filtered);
         setManualWheelIds([]);
-        setStatus(`已找到 ${results.length} 家餐廳，你可以點擊轉盤來選擇`);
+        setStatus(`已找到 ${filtered.length} 家餐廳`);
       })();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo.location]);
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -59,42 +61,68 @@ export default function Home() {
   // --- Derived status message ---
   const displayStatus = geo.error ?? status;
 
+  const locationStatus =
+    geo.location && !geo.isLocating
+      ? "定位成功，請選擇距離帶搜尋餐廳"
+      : undefined;
+
   // --- Handlers ---
   const handleLocate = useCallback(() => {
     geo.locate();
     setStatus("定位中…");
-    // We rely on geo.location being set asynchronously
   }, [geo]);
 
-  // Update status when location changes
-  const locationStatus =
-    geo.location && !geo.isLocating
-      ? "定位成功，請設定事始半徑並搜尋餐廳"
-      : undefined;
+  /** 切換距離帶 — 純 client 端過濾，不再打 API */
+  const handleBandChange = useCallback(
+    (newBand: DistanceBandKey) => {
+      setBand(newBand);
+      if (!geo.location) return;
 
-  const handleSearch = useCallback(async () => {
-    if (!geo.location) {
-      setStatus("請先完成定位");
-      return;
-    }
+      const bandDef = DISTANCE_BANDS.find((b) => b.key === newBand)!;
+      const location = geo.location;
 
-    setStatus("搜尋附近餐廳中…");
-    const results = await searchHook.search(geo.location, radius);
+      // 如果還沒搜尋過，先打一次 API
+      if (searchHook.allRestaurants.length === 0) {
+        (async () => {
+          setStatus("搜尋附近餐廳中…");
+          const { all } = await searchHook.search(location);
+          // search 預設用 "near"，這邊再套用目標 band
+          searchHook.applyBand(newBand, location);
+          const filtered = filterByDistance(all, location.lat, location.lng, bandDef.maxMeters);
+          if (filtered.length > 0) {
+            wheel.fillRandom(filtered);
+            setManualWheelIds([]);
+            setStatus(`「${bandDef.label}」找到 ${filtered.length} 家餐廳`);
+          } else {
+            setStatus(`「${bandDef.label}」範圍內沒有餐廳`);
+          }
+        })();
+        return;
+      }
 
-    if (results.length === 0) {
-      setStatus("附近找不到餐廳，請嘗試其他地點");
-      return;
-    }
+      // 已有快取資料，純 client 端過濾
+      searchHook.applyBand(newBand, location);
+      const filtered = filterByDistance(
+        searchHook.allRestaurants,
+        location.lat,
+        location.lng,
+        bandDef.maxMeters,
+      );
 
-    // 只填入轉盤，不自動投丫推荐
-    const picked = wheel.fillRandom(results);
-    setManualWheelIds([]);
-    setStatus(`已找到 ${results.length} 家餐廳，你可以鑿擋鐫馬來骋馬`);
-  }, [geo.location, searchHook, wheel, radius]);
+      if (filtered.length > 0) {
+        wheel.fillRandom(filtered);
+        setManualWheelIds([]);
+        setStatus(`「${bandDef.label}」找到 ${filtered.length} 家餐廳`);
+      } else {
+        setStatus(`「${bandDef.label}」範圍內沒有餐廳，試試其他距離`);
+      }
+    },
+    [geo.location, searchHook, wheel],
+  );
 
   const handleSpin = useCallback(() => {
     if (wheel.items.length === 0) {
-      setStatus("就儀並沒有餐廳，請先搜尋");
+      setStatus("轉盤裡沒有餐廳，請先搜尋");
       return;
     }
     wheel.spin();
@@ -121,7 +149,6 @@ export default function Home() {
             ? [...prev, id]
             : prev;
 
-        // Sync wheel items
         const selected = searchHook.restaurants.filter((r) =>
           nextIds.includes(r.id),
         );
@@ -159,26 +186,9 @@ export default function Home() {
         isLocating={geo.isLocating}
         isSearching={searchHook.isSearching}
         hasLocation={!!geo.location}
-        radius={radius}
+        band={band}
         onLocate={handleLocate}
-        onRadiusChange={(newRadius) => {
-          setRadius(newRadius);
-          // 切換半徑時立即執行搜尋
-          if (geo.location) {
-            const location = geo.location;
-            (async () => {
-              setStatus("搜尋附近餐廳中…");
-              const results = await searchHook.search(location, newRadius);
-              if (results.length === 0) {
-                setStatus("附近找不到餐廳，請嘗試其他地點");
-                return;
-              }
-              const picked = wheel.fillRandom(results);
-              setManualWheelIds([]);
-              setStatus(`已找到 ${results.length} 家餐廳，你可以鑿擋鐫馬來骋馬`);
-            })();
-          }
-        }}
+        onBandChange={handleBandChange}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
@@ -203,7 +213,6 @@ export default function Home() {
 
         {/* Main 2-column layout */}
         <div className="grid gap-6 lg:grid-cols-5">
-          {/* Wheel - takes more space */}
           <div className="space-y-6 lg:col-span-3">
             <WheelSection
               items={wheel.items}
@@ -214,7 +223,6 @@ export default function Home() {
               onSelect={handleSelectRestaurant}
             />
 
-            {/* Map */}
             <MapSection
               apiKey={googleMapsApiKey}
               location={geo.location}
@@ -224,7 +232,6 @@ export default function Home() {
             />
           </div>
 
-          {/* Restaurant list - sidebar */}
           <div className="lg:col-span-2">
             <RestaurantList
               restaurants={searchHook.restaurants}
@@ -236,7 +243,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Favorites - full width */}
         <FavoritesSection
           favorites={favs.favorites}
           onAddToWheel={wheel.addItem}

@@ -1,11 +1,14 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS } from "@/lib/constants";
+
+const PAGE_SIZE = 10;
 
 type RestaurantListProps = {
   restaurants: Restaurant[];
@@ -22,6 +25,19 @@ export function RestaurantList({
   onSelect,
   onViewOnMap,
 }: RestaurantListProps) {
+  const [page, setPage] = useState(0);
+
+  // 餐廳列表改變時（重新搜尋）自動回到第一頁
+  useEffect(() => {
+    setPage(0);
+  }, [restaurants]);
+
+  const totalPages = Math.ceil(restaurants.length / PAGE_SIZE);
+  const pagedRestaurants = restaurants.slice(
+    page * PAGE_SIZE,
+    (page + 1) * PAGE_SIZE,
+  );
+
   return (
     <CardContainer>
       <CardHeader>
@@ -41,8 +57,8 @@ export function RestaurantList({
             <p className="text-sm text-gray-500">點擊「搜尋附近餐廳」開始探索</p>
           </div>
         ) : (
-          <div className="max-h-[480px] space-y-2 overflow-y-auto pr-1">
-            {restaurants.map((restaurant) => {
+          <div className="space-y-2">
+            {pagedRestaurants.map((restaurant) => {
               const checked = manualWheelIds.includes(restaurant.id);
               return (
                 <div
@@ -92,6 +108,31 @@ export function RestaurantList({
                 </div>
               );
             })}
+
+            {/* 翻頁控制 */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 0}
+                >
+                  ← 上一頁
+                </Button>
+                <span className="text-xs text-gray-500">
+                  {page + 1} / {totalPages}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= totalPages - 1}
+                >
+                  下一頁 →
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </CardBody>
