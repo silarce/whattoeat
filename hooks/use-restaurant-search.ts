@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { LatLng, Restaurant } from "@/types/restaurant";
 import { searchAllNearby, filterByDistance, createMockRestaurants } from "@/lib/places-api";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS } from "@/lib/constants";
+
+const PAGE_SIZE = 10;
 
 type SearchState = {
   /** API 回傳的完整列表（1200m 內） */
@@ -66,5 +68,25 @@ export function useRestaurantSearch() {
     });
   }, []);
 
-  return { ...state, search, applyBand };
+  // --- 分頁 ---
+  const [page, setPage] = useState(0);
+
+  // restaurants 變更時自動回到第一頁
+  const totalPages = Math.ceil(state.restaurants.length / PAGE_SIZE);
+  const safePage = page >= totalPages ? 0 : page;
+
+  const pagedRestaurants = useMemo(
+    () => state.restaurants.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
+    [state.restaurants, safePage],
+  );
+
+  return {
+    ...state,
+    search,
+    applyBand,
+    page: safePage,
+    totalPages,
+    pagedRestaurants,
+    setPage,
+  };
 }

@@ -230,7 +230,11 @@ export default function Home() {
 
           <div className="lg:col-span-2">
             <RestaurantList
-              restaurants={searchHook.restaurants}
+              totalCount={searchHook.restaurants.length}
+              pagedRestaurants={searchHook.pagedRestaurants}
+              page={searchHook.page}
+              totalPages={searchHook.totalPages}
+              onPageChange={searchHook.setPage}
               manualWheelIds={manualWheelIds}
               onToggleWheel={handleToggleWheel}
               onSelect={handleSelectRestaurant}

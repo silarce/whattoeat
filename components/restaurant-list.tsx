@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS } from "@/lib/constants";
 
-const PAGE_SIZE = 10;
-
 type RestaurantListProps = {
-  restaurants: Restaurant[];
+  totalCount: number;
+  pagedRestaurants: Restaurant[];
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
   manualWheelIds: string[];
   onToggleWheel: (id: string) => void;
   onSelect: (restaurant: Restaurant) => void;
@@ -19,40 +20,32 @@ type RestaurantListProps = {
 };
 
 export function RestaurantList({
-  restaurants,
+  totalCount,
+  pagedRestaurants,
+  page,
+  totalPages,
+  onPageChange,
   manualWheelIds,
   onToggleWheel,
   onSelect,
   onViewOnMap,
 }: RestaurantListProps) {
-  const [page, setPage] = useState(0);
-
-  // 餐廳列表改變時（重新搜尋）自動回到第一頁
-  useEffect(() => {
-    setPage(0);
-  }, [restaurants]);
-
-  const totalPages = Math.ceil(restaurants.length / PAGE_SIZE);
-  const pagedRestaurants = restaurants.slice(
-    page * PAGE_SIZE,
-    (page + 1) * PAGE_SIZE,
-  );
 
   return (
     <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">📋 附近餐廳</h2>
-          <Badge variant="info">{restaurants.length} 家</Badge>
+          <Badge variant="info">{totalCount} 家</Badge>
         </div>
-        {restaurants.length > 0 && (
+        {totalCount > 0 && (
           <p className="mt-1 text-xs text-gray-500">
             勾選可手動加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
           </p>
         )}
       </CardHeader>
       <CardBody>
-        {restaurants.length === 0 ? (
+        {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
             <p className="text-sm text-gray-500">點擊「搜尋附近餐廳」開始探索</p>
           </div>
@@ -115,7 +108,7 @@ export function RestaurantList({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setPage((p) => p - 1)}
+                  onClick={() => onPageChange(page - 1)}
                   disabled={page === 0}
                 >
                   ← 上一頁
@@ -126,7 +119,7 @@ export function RestaurantList({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => onPageChange(page + 1)}
                   disabled={page >= totalPages - 1}
                 >
                   下一頁 →
