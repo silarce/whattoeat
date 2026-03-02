@@ -1,19 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import RestaurantMap from "@/components/RestaurantMap";
+import type { Restaurant } from "@/types/restaurant";
 import {
   addFavorite,
   getFavorites,
   removeFavorite,
   type FavoriteRestaurant,
 } from "@/lib/favorites-db";
-
-type Restaurant = {
-  id: string;
-  name: string;
-  photoUrl?: string;
-  address?: string;
-};
 
 const SEARCH_RADII = [100, 300, 500];
 const MAX_WHEEL_ITEMS = 10;
@@ -28,6 +23,8 @@ function toFavorite(restaurant: Restaurant): FavoriteRestaurant {
     name: restaurant.name,
     photoUrl: restaurant.photoUrl,
     address: restaurant.address,
+    lat: restaurant.lat,
+    lng: restaurant.lng,
   };
 }
 
@@ -43,6 +40,11 @@ export default function Home() {
   const [winner, setWinner] = useState<Restaurant | null>(null);
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
+  const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
+
+  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+
 
   const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites]);
 
@@ -59,6 +61,12 @@ export default function Home() {
     setWheelItems(selected);
   };
 
+  const pickAsWinner = (restaurant: Restaurant) => {
+    setWinner(restaurant);
+    setMapTarget(restaurant);
+    setStatus(`你選擇了：${restaurant.name}`);
+  };
+
   const handleLocate = () => {
     if (!navigator.geolocation) {
       setStatus("此裝置不支援定位功能");
@@ -73,6 +81,12 @@ export default function Home() {
           lng: position.coords.longitude,
         };
         setLocation(nextLocation);
+        setMapTarget({
+          id: "current-location",
+          name: "目前位置",
+          lat: nextLocation.lat,
+          lng: nextLocation.lng,
+        });
         setStatus("定位成功，可開始搜尋附近餐廳");
       },
       () => {
@@ -94,7 +108,7 @@ export default function Home() {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask":
-          "places.id,places.displayName,places.formattedAddress,places.photos",
+          "places.id,places.displayName,places.formattedAddress,places.photos,places.location",
       },
       body: JSON.stringify({
         includedTypes: ["restaurant"],
@@ -118,6 +132,7 @@ export default function Home() {
         displayName?: { text?: string };
         formattedAddress?: string;
         photos?: Array<{ name: string }>;
+        location?: { latitude?: number; longitude?: number };
       }>;
     };
 
@@ -135,6 +150,8 @@ export default function Home() {
           name: place.displayName?.text as string,
           address: place.formattedAddress,
           photoUrl,
+          lat: place.location?.latitude,
+          lng: place.location?.longitude,
         } satisfies Restaurant;
       });
   };
@@ -144,6 +161,8 @@ export default function Home() {
       id: `mock-${index + 1}`,
       name: `附近餐廳 ${index + 1}`,
       address: `模擬地址 ${index + 1}`,
+      lat: location ? location.lat + (Math.random() - 0.5) * 0.01 : undefined,
+      lng: location ? location.lng + (Math.random() - 0.5) * 0.01 : undefined,
     }));
   };
 
@@ -170,14 +189,47 @@ export default function Home() {
 
       setRestaurants(uniqueRestaurants);
       setManualWheelIds([]);
-      setWheelItems(pickRandomItems(uniqueRestaurants, MAX_WHEEL_ITEMS));
-      setStatus(`已找到 ${uniqueRestaurants.length} 家餐廳，轉盤已隨機載入最多 10 家`);
+      const selectedWheel = pickRandomItems(uniqueRestaurants, MAX_WHEEL_ITEMS);
+      setWheelItems(selectedWheel);
+      setMapTarget(uniqueRestaurants[0]);
+      
+      // 調試：檢查取得的餐廳資料
+      console.log("Search results - Total restaurants:", uniqueRestaurants.length);
+      console.log("Search results - Sample data:", uniqueRestaurants.slice(0, 3));
+      console.log(
+        "Search results - Restaurants with coords:",
+        uniqueRestaurants.filter((r) => r.lat && r.lng).length,
+      );
+
+      setStatus(`已找到 ${uniqueRestaurants.length} 家餐廳，正在轉盤抽選...`);
+      
+      // 自動執行轉盤抽選
+      setTimeout(() => {
+        const finalIndex = Math.floor(Math.random() * selectedWheel.length);
+        const selected = selectedWheel[finalIndex];
+        setSelectedWheelIndex(finalIndex);
+        setWinner(selected);
+        setMapTarget(selected);
+        setStatus(`推薦：${selected.name}`);
+      }, 800);
     } catch {
       const fallback = createMockRestaurants();
       setRestaurants(fallback);
       setManualWheelIds([]);
-      setWheelItems(pickRandomItems(fallback, MAX_WHEEL_ITEMS));
-      setStatus("Google API 暫時不可用，已切換為本地模擬資料");
+      const selectedWheel = pickRandomItems(fallback, MAX_WHEEL_ITEMS);
+      setWheelItems(selectedWheel);
+      setMapTarget(fallback[0]);
+      setStatus("Google API 暫時不可用，已切換為本地模擬資料，正在轉盤抽選...");
+      
+      // 自動執行轉盤抽選
+      setTimeout(() => {
+        const finalIndex = Math.floor(Math.random() * selectedWheel.length);
+        const selected = selectedWheel[finalIndex];
+        setSelectedWheelIndex(finalIndex);
+        setWinner(selected);
+        setMapTarget(selected);
+        setStatus(`推薦：${selected.name}`);
+      }, 800);
     }
   };
 
@@ -230,6 +282,7 @@ export default function Home() {
         const selected = wheelItems[finalIndex];
         setSelectedWheelIndex(finalIndex);
         setWinner(selected);
+        setMapTarget(selected);
         setIsSpinning(false);
         setStatus(`今天吃：${selected.name}`);
       }
@@ -255,6 +308,14 @@ export default function Home() {
 
     setWheelItems((prev) => [...prev, favorite]);
   };
+
+  const openMapUrl = useMemo(() => {
+    if (mapTarget?.lat && mapTarget?.lng) {
+      return `https://www.google.com/maps/search/?api=1&query=${mapTarget.lat},${mapTarget.lng}`;
+    }
+
+    return "https://www.google.com/maps";
+  }, [mapTarget]);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -305,11 +366,10 @@ export default function Home() {
             {wheelItems.map((item, index) => (
               <div
                 key={item.id}
-                className={`rounded-xl border p-3 text-sm transition ${
-                  index === selectedWheelIndex
-                    ? "border-black bg-black text-white"
-                    : "border-black/20 bg-white"
-                }`}
+                className={`rounded-xl border p-3 text-sm transition ${index === selectedWheelIndex
+                  ? "border-black bg-black text-white"
+                  : "border-black/20 bg-white"
+                  }`}
               >
                 <p className="line-clamp-2 font-medium">{item.name}</p>
               </div>
@@ -338,27 +398,78 @@ export default function Home() {
             {restaurants.map((restaurant) => {
               const checked = manualWheelIds.includes(restaurant.id);
               return (
-                <label
+                <div
                   key={restaurant.id}
-                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/15 p-3"
+                  className="rounded-xl border border-black/15 p-3"
                 >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleManualWheel(restaurant.id)}
-                    className="mt-1"
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{restaurant.name}</p>
-                    {restaurant.address && (
-                      <p className="truncate text-xs text-black/60">{restaurant.address}</p>
-                    )}
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleManualWheel(restaurant.id)}
+                      className="mt-1"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{restaurant.name}</p>
+                      {restaurant.address && (
+                        <p className="truncate text-xs text-black/60">{restaurant.address}</p>
+                      )}
+                    </div>
                   </div>
-                </label>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setMapTarget(restaurant)}
+                      className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
+                    >
+                      地圖查看
+                    </button>
+                    <button
+                      onClick={() => pickAsWinner(restaurant)}
+                      className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
+                    >
+                      直接選這家
+                    </button>
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">附近餐廳地圖</h2>
+          <a
+            href={openMapUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
+          >
+            在 Google 地圖開啟
+          </a>
+        </div>
+
+        {googleMapsApiKey && location ? (
+          <RestaurantMap
+            apiKey={googleMapsApiKey}
+            location={location}
+            restaurants={restaurants}
+            onSelectRestaurant={pickAsWinner}
+          />
+        ) : (
+          <div className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-black/70">
+            {!googleMapsApiKey
+              ? "尚未設定 `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`"
+              : "請先完成定位"}
+          </div>
+        )}
+
+        {mapTarget && (
+          <p className="mt-3 text-sm text-black/70">
+            目前地圖目標：<span className="font-semibold text-black">{mapTarget.name}</span>
+          </p>
+        )}
       </section>
 
       <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
@@ -378,6 +489,12 @@ export default function Home() {
                   className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
                 >
                   加入轉盤
+                </button>
+                <button
+                  onClick={() => setMapTarget(item)}
+                  className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
+                >
+                  地圖查看
                 </button>
                 <button
                   onClick={() => handleRemoveFavorite(item.id)}

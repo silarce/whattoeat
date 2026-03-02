@@ -5,6 +5,8 @@ export type FavoriteRestaurant = {
   name: string;
   photoUrl?: string;
   address?: string;
+  lat?: number;
+  lng?: number;
 };
 
 type WhatToEatDB = {
