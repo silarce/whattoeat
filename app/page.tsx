@@ -320,8 +320,8 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
       <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-bold">What To Eat</h1>
-        <p className="mt-2 text-sm text-black/70">{status}</p>
+        <h1 className="text-2xl font-bold text-black">What To Eat</h1>
+        <p className="mt-2 text-sm text-black">{status}</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={handleLocate}
@@ -343,7 +343,7 @@ export default function Home() {
           </button>
         </div>
         {location && (
-          <p className="mt-3 text-xs text-black/60">
+          <p className="mt-3 text-xs text-black/80">
             目前位置：{location.lat.toFixed(5)}, {location.lng.toFixed(5)}
           </p>
         )}
@@ -352,7 +352,7 @@ export default function Home() {
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">轉盤</h2>
+            <h2 className="text-lg font-semibold text-black">轉盤</h2>
             <button
               onClick={handleSpin}
               disabled={isSpinning || wheelItems.length === 0}
@@ -378,9 +378,9 @@ export default function Home() {
 
           {winner && (
             <div className="mt-4 rounded-xl border border-black/20 bg-black/5 p-4">
-              <p className="text-sm text-black/70">推薦結果</p>
+              <p className="text-sm text-black">推薦結果</p>
               <p className="text-xl font-bold">{winner.name}</p>
-              {winner.address && <p className="mt-1 text-sm text-black/70">{winner.address}</p>}
+              {winner.address && <p className="mt-1 text-sm text-black/90">{winner.address}</p>}
               <button
                 onClick={() => handleAddFavorite(winner)}
                 disabled={favoriteIds.has(winner.id)}
@@ -393,7 +393,7 @@ export default function Home() {
         </div>
 
         <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold">附近餐廳（可手動加入轉盤，最多 10 家）</h2>
+          <h2 className="text-lg font-semibold text-black">附近餐廳（可手動加入轉盤，最多 10 家）</h2>
           <div className="mt-3 max-h-96 space-y-2 overflow-auto pr-1">
             {restaurants.map((restaurant) => {
               const checked = manualWheelIds.includes(restaurant.id);
@@ -412,7 +412,7 @@ export default function Home() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{restaurant.name}</p>
                       {restaurant.address && (
-                        <p className="truncate text-xs text-black/60">{restaurant.address}</p>
+                        <p className="truncate text-xs text-black/80">{restaurant.address}</p>
                       )}
                     </div>
                   </div>
@@ -439,7 +439,7 @@ export default function Home() {
 
       <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">附近餐廳地圖</h2>
+          <h2 className="text-lg font-semibold text-black">附近餐廳地圖</h2>
           <a
             href={openMapUrl}
             target="_blank"
@@ -458,15 +458,15 @@ export default function Home() {
             onSelectRestaurant={pickAsWinner}
           />
         ) : (
-          <div className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-black/70">
+          <div className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-black">
             {!googleMapsApiKey
-              ? "尚未設定 `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`"
+              ? "尚未設定 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
               : "請先完成定位"}
           </div>
         )}
 
         {mapTarget && (
-          <p className="mt-3 text-sm text-black/70">
+          <p className="mt-3 text-sm text-black/80">
             目前地圖目標：<span className="font-semibold text-black">{mapTarget.name}</span>
           </p>
         )}
@@ -474,15 +474,15 @@ export default function Home() {
 
       <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">我的收藏</h2>
-          <span className="text-sm text-black/60">{favorites.length} 筆</span>
+          <h2 className="text-lg font-semibold text-black">我的收藏</h2>
+          <span className="text-sm text-black/80">{favorites.length} 筆</span>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {favorites.map((item) => (
             <article key={item.id} className="rounded-xl border border-black/15 p-3">
               <p className="font-medium">{item.name}</p>
-              {item.address && <p className="mt-1 text-xs text-black/60">{item.address}</p>}
+              {item.address && <p className="mt-1 text-xs text-black/80">{item.address}</p>}
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={() => addFavoriteToWheel(item)}
