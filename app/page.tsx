@@ -318,195 +318,210 @@ export default function Home() {
   }, [mapTarget]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-        <h1 className="text-2xl font-bold text-black">What To Eat</h1>
-        <p className="mt-2 text-sm text-black">{status}</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button
-            onClick={handleLocate}
-            className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white"
-          >
-            取得定位
-          </button>
-          <button
-            onClick={handleSearch}
-            className="rounded-full border border-black px-4 py-2 text-sm font-semibold"
-          >
-            搜尋附近餐廳
-          </button>
-          <button
-            onClick={randomizeWheel}
-            className="rounded-full border border-black px-4 py-2 text-sm font-semibold"
-          >
-            系統隨機產生轉盤（最多 10）
-          </button>
-        </div>
-        {location && (
-          <p className="mt-3 text-xs text-black/80">
-            目前位置：{location.lat.toFixed(5)}, {location.lng.toFixed(5)}
-          </p>
-        )}
-      </section>
-
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-black">轉盤</h2>
+    <main className="min-h-screen w-full bg-gray-50">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">What To Eat</h1>
+          <p className="mt-2 text-base font-medium text-gray-900">{status}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
             <button
-              onClick={handleSpin}
-              disabled={isSpinning || wheelItems.length === 0}
-              className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={handleLocate}
+              className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
             >
-              {isSpinning ? "旋轉中..." : "開始抽選"}
+              取得定位
+            </button>
+            <button
+              onClick={handleSearch}
+              className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              搜尋附近餐廳
+            </button>
+            <button
+              onClick={randomizeWheel}
+              className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              系統隨機產生轉盤（最多 10）
             </button>
           </div>
+          {location && (
+            <p className="mt-4 text-sm text-gray-600">
+              目前位置：{location.lat.toFixed(5)}, {location.lng.toFixed(5)}
+            </p>
+          )}
+        </section>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {wheelItems.map((item, index) => (
-              <div
-                key={item.id}
-                className={`rounded-xl border p-3 text-sm transition ${index === selectedWheelIndex
-                  ? "border-black bg-black text-white"
-                  : "border-black/20 bg-white"
-                  }`}
-              >
-                <p className="line-clamp-2 font-medium">{item.name}</p>
-              </div>
-            ))}
-          </div>
-
-          {winner && (
-            <div className="mt-4 rounded-xl border border-black/20 bg-black/5 p-4">
-              <p className="text-sm text-black">推薦結果</p>
-              <p className="text-xl font-bold">{winner.name}</p>
-              {winner.address && <p className="mt-1 text-sm text-black/90">{winner.address}</p>}
+        {/* Main Content Grid */}
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          {/* Wheel Section */}
+          <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">轉盤</h2>
               <button
-                onClick={() => handleAddFavorite(winner)}
-                disabled={favoriteIds.has(winner.id)}
-                className="mt-3 rounded-full border border-black px-4 py-2 text-sm font-semibold disabled:opacity-40"
+                onClick={handleSpin}
+                disabled={isSpinning || wheelItems.length === 0}
+                className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                {favoriteIds.has(winner.id) ? "已在收藏" : "加入收藏"}
+                {isSpinning ? "旋轉中..." : "開始抽選"}
               </button>
             </div>
-          )}
-        </div>
 
-        <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-black">附近餐廳（可手動加入轉盤，最多 10 家）</h2>
-          <div className="mt-3 max-h-96 space-y-2 overflow-auto pr-1">
-            {restaurants.map((restaurant) => {
-              const checked = manualWheelIds.includes(restaurant.id);
-              return (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {wheelItems.map((item, index) => (
                 <div
-                  key={restaurant.id}
-                  className="rounded-xl border border-black/15 p-3"
+                  key={item.id}
+                  className={`rounded-xl border-2 p-4 text-sm font-medium transition-all ${
+                    index === selectedWheelIndex
+                      ? "border-blue-600 bg-blue-50 text-blue-900 shadow-md"
+                      : "border-gray-200 bg-white text-gray-900 hover:border-gray-300"
+                  }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleManualWheel(restaurant.id)}
-                      className="mt-1"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{restaurant.name}</p>
-                      {restaurant.address && (
-                        <p className="truncate text-xs text-black/80">{restaurant.address}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setMapTarget(restaurant)}
-                      className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
-                    >
-                      地圖查看
-                    </button>
-                    <button
-                      onClick={() => pickAsWinner(restaurant)}
-                      className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
-                    >
-                      直接選這家
-                    </button>
-                  </div>
+                  <p className="line-clamp-2">{item.name}</p>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+              ))}
+            </div>
 
-      <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-black">附近餐廳地圖</h2>
-          <a
-            href={openMapUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
-          >
-            在 Google 地圖開啟
-          </a>
-        </div>
-
-        {googleMapsApiKey && location ? (
-          <RestaurantMap
-            apiKey={googleMapsApiKey}
-            location={location}
-            restaurants={restaurants}
-            onSelectRestaurant={pickAsWinner}
-          />
-        ) : (
-          <div className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-black">
-            {!googleMapsApiKey
-              ? "尚未設定 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
-              : "請先完成定位"}
-          </div>
-        )}
-
-        {mapTarget && (
-          <p className="mt-3 text-sm text-black/80">
-            目前地圖目標：<span className="font-semibold text-black">{mapTarget.name}</span>
-          </p>
-        )}
-      </section>
-
-      <section className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-black">我的收藏</h2>
-          <span className="text-sm text-black/80">{favorites.length} 筆</span>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {favorites.map((item) => (
-            <article key={item.id} className="rounded-xl border border-black/15 p-3">
-              <p className="font-medium">{item.name}</p>
-              {item.address && <p className="mt-1 text-xs text-black/80">{item.address}</p>}
-              <div className="mt-3 flex gap-2">
+            {winner && (
+              <div className="mt-6 rounded-xl border-2 border-green-200 bg-green-50 p-5">
+                <p className="text-sm font-medium text-green-900">推薦結果</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{winner.name}</p>
+                {winner.address && <p className="mt-2 text-sm text-gray-600">{winner.address}</p>}
                 <button
-                  onClick={() => addFavoriteToWheel(item)}
-                  className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
+                  onClick={() => handleAddFavorite(winner)}
+                  disabled={favoriteIds.has(winner.id)}
+                  className="mt-4 inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:bg-gray-100 disabled:text-gray-400"
                 >
-                  加入轉盤
-                </button>
-                <button
-                  onClick={() => setMapTarget(item)}
-                  className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
-                >
-                  地圖查看
-                </button>
-                <button
-                  onClick={() => handleRemoveFavorite(item.id)}
-                  className="rounded-full border border-black px-3 py-1 text-xs font-semibold"
-                >
-                  移除
+                  {favoriteIds.has(winner.id) ? "已在收藏" : "加入收藏"}
                 </button>
               </div>
-            </article>
-          ))}
+            )}
+          </section>
+
+          {/* Restaurant List Section */}
+          <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            <h2 className="text-xl font-semibold text-gray-900">
+              附近餐廳（可手動加入轉盤，最多 10 家）
+            </h2>
+            <div className="mt-4 max-h-96 space-y-3 overflow-auto pr-2">
+              {restaurants.map((restaurant) => {
+                const checked = manualWheelIds.includes(restaurant.id);
+                return (
+                  <div
+                    key={restaurant.id}
+                    className="rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md"
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleManualWheel(restaurant.id)}
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold text-gray-900">{restaurant.name}</p>
+                        {restaurant.address && (
+                          <p className="mt-1 truncate text-sm text-gray-600">{restaurant.address}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setMapTarget(restaurant)}
+                        className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+                      >
+                        地圖查看
+                      </button>
+                      <button
+                        onClick={() => pickAsWinner(restaurant)}
+                        className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+                      >
+                        直接選這家
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
         </div>
-      </section>
+
+        {/* Map Section */}
+        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">附近餐廳地圖</h2>
+            <a
+              href={openMapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+            >
+              在 Google 地圖開啟
+            </a>
+          </div>
+
+          {googleMapsApiKey && location ? (
+            <RestaurantMap
+              apiKey={googleMapsApiKey}
+              location={location}
+              restaurants={restaurants}
+              onSelectRestaurant={pickAsWinner}
+            />
+          ) : (
+            <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+              <p className="text-sm font-medium text-gray-900">
+                {!googleMapsApiKey
+                  ? "尚未設定 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
+                  : "請先完成定位"}
+              </p>
+            </div>
+          )}
+
+          {mapTarget && (
+            <p className="mt-4 text-sm text-gray-600">
+              目前地圖目標：<span className="font-semibold text-gray-900">{mapTarget.name}</span>
+            </p>
+          )}
+        </section>
+
+        {/* Favorites Section */}
+        <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-gray-900">我的收藏</h2>
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-900">
+              {favorites.length} 筆
+            </span>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {favorites.map((item) => (
+              <article key={item.id} className="rounded-xl border border-gray-200 bg-white p-4 transition-shadow hover:shadow-md">
+                <p className="font-semibold text-gray-900">{item.name}</p>
+                {item.address && <p className="mt-1 text-sm text-gray-600">{item.address}</p>}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => addFavoriteToWheel(item)}
+                    className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+                  >
+                    加入轉盤
+                  </button>
+                  <button
+                    onClick={() => setMapTarget(item)}
+                    className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2"
+                  >
+                    地圖查看
+                  </button>
+                  <button
+                    onClick={() => handleRemoveFavorite(item.id)}
+                    className="inline-flex items-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                  >
+                    移除
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
