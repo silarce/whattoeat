@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useRestaurantSearch } from "@/hooks/use-restaurant-search";
@@ -13,6 +13,7 @@ import { WinnerCard } from "@/components/winner-card";
 import { RestaurantList } from "@/components/restaurant-list";
 import { MapSection } from "@/components/map-section";
 import { FavoritesSection } from "@/components/favorites-section";
+import { LocationPermissionModal } from "@/components/location-permission-modal";
 
 export default function Home() {
   // --- Hooks ---
@@ -22,10 +23,17 @@ export default function Home() {
   const favs = useFavorites();
 
   // --- Local state ---
-  const [status, setStatus] = useState("請先取得定位，開始找餐廳");
+  const [status, setStatus] = useState("定位中…");
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
+  const [radius, setRadius] = useState(100);
+
+  // 挂載後自動定位
+  useEffect(() => {
+    geo.locate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -41,7 +49,7 @@ export default function Home() {
 
   // Update status when location changes
   const locationStatus =
-    geo.location && !geo.isLocating && status === "定位中…"
+    geo.location && !geo.isLocating
       ? "定位成功，可開始搜尋附近餐廳"
       : undefined;
 
@@ -52,7 +60,7 @@ export default function Home() {
     }
 
     setStatus("搜尋附近餐廳中…");
-    const results = await searchHook.search(geo.location);
+    const results = await searchHook.search(geo.location, radius);
 
     if (results.length === 0) {
       setStatus("附近找不到餐廳，請嘗試其他地點");
@@ -70,7 +78,7 @@ export default function Home() {
       setStatus(`推薦：${winner.name}`);
       setIsWinnerModalOpen(true);
     }, AUTO_SPIN_DELAY);
-  }, [geo.location, searchHook, wheel]);
+  }, [geo.location, searchHook, wheel, radius]);
 
   const handleSpin = useCallback(() => {
     wheel.spin();
@@ -142,11 +150,20 @@ export default function Home() {
         isLocating={geo.isLocating}
         isSearching={searchHook.isSearching}
         hasLocation={!!geo.location}
+        radius={radius}
         onLocate={handleLocate}
         onSearch={handleSearch}
+        onRadiusChange={setRadius}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+        {/* Location Permission Modal */}
+        <LocationPermissionModal
+          isOpen={geo.permissionDenied}
+          onClose={geo.clearPermissionDenied}
+          onRetry={geo.locate}
+        />
+
         {/* Winner Modal */}
         <WinnerCard
           winner={wheel.winner}

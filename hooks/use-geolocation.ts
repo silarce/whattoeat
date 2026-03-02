@@ -7,6 +7,7 @@ type GeolocationState = {
   location: LatLng | null;
   isLocating: boolean;
   error: string | null;
+  permissionDenied: boolean;
 };
 
 /**
@@ -17,6 +18,7 @@ export function useGeolocation() {
     location: null,
     isLocating: false,
     error: null,
+    permissionDenied: false,
   });
 
   const locate = useCallback(() => {
@@ -24,11 +26,12 @@ export function useGeolocation() {
       setState((prev) => ({
         ...prev,
         error: "此裝置不支援定位功能",
+        permissionDenied: false,
       }));
       return;
     }
 
-    setState((prev) => ({ ...prev, isLocating: true, error: null }));
+    setState((prev) => ({ ...prev, isLocating: true, error: null, permissionDenied: false }));
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -39,18 +42,25 @@ export function useGeolocation() {
           },
           isLocating: false,
           error: null,
+          permissionDenied: false,
         });
       },
-      () => {
+      (err) => {
+        const denied = err.code === err.PERMISSION_DENIED;
         setState((prev) => ({
           ...prev,
           isLocating: false,
-          error: "定位失敗，請確認瀏覽器定位權限",
+          error: denied ? null : "定位失敗，請稍後再試",
+          permissionDenied: denied,
         }));
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
   }, []);
 
-  return { ...state, locate };
+  const clearPermissionDenied = useCallback(() => {
+    setState((prev) => ({ ...prev, permissionDenied: false }));
+  }, []);
+
+  return { ...state, locate, clearPermissionDenied };
 }

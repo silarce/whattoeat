@@ -2,7 +2,6 @@ import type { Restaurant } from "@/types/restaurant";
 import {
   PLACES_API_URL,
   PLACES_FIELD_MASK,
-  SEARCH_RADII,
 } from "@/lib/constants";
 
 type PlaceResponse = {
@@ -70,19 +69,16 @@ async function fetchByRadius(
 }
 
 /**
- * 搜尋附近餐廳 (多半徑合併，去重)
+ * 搜尋附近餐廳 (單一半徑)
  */
 export async function searchNearbyRestaurants(
   lat: number,
   lng: number,
   apiKey: string,
+  radius = 100,
 ): Promise<Restaurant[]> {
-  const allResults = await Promise.all(
-    SEARCH_RADII.map((radius) => fetchByRadius(radius, lat, lng, apiKey)),
-  );
-
-  const merged = allResults.flat();
-  const uniqueMap = new Map(merged.map((item) => [item.id, item]));
+  const results = await fetchByRadius(radius, lat, lng, apiKey);
+  const uniqueMap = new Map(results.map((item) => [item.id, item]));
   return Array.from(uniqueMap.values());
 }
 

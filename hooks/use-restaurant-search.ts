@@ -20,7 +20,7 @@ export function useRestaurantSearch() {
     error: null,
   });
 
-  const search = useCallback(async (location: LatLng) => {
+  const search = useCallback(async (location: LatLng, radius = 100) => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     setState({ restaurants: [], isSearching: true, error: null });
@@ -34,6 +34,7 @@ export function useRestaurantSearch() {
         location.lat,
         location.lng,
         apiKey,
+        radius,
       );
 
       if (results.length === 0) {
