@@ -74,13 +74,13 @@ export function WinnerCard({
               >
                 {isFavorite ? "✅ 已收藏" : "❤️ 加入收藏"}
               </Button>
-              {winner.lat && winner.lng && (
+              {winner.id && (
                 <Button
                   variant="ghost"
                   size="md"
                   onClick={() =>
                     window.open(
-                      `https://www.google.com/maps/search/?api=1&query=${winner.lat},${winner.lng}`,
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(winner.name)}&query_place_id=${winner.id}`,
                       "_blank",
                     )
                   }
