@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
+    "@radix-ui/react-dialog": "^1.1.15",
     "clsx": "^2.1.1",
     "idb": "^8.0.3",
     "next": "16.1.6",

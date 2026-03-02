@@ -25,6 +25,7 @@ export default function Home() {
   const [status, setStatus] = useState("請先取得定位，開始找餐廳");
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
+  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -67,6 +68,7 @@ export default function Home() {
       const winner = wheel.autoSelect(picked);
       setMapTarget(winner);
       setStatus(`推薦：${winner.name}`);
+      setIsWinnerModalOpen(true);
     }, AUTO_SPIN_DELAY);
   }, [geo.location, searchHook, wheel]);
 
@@ -79,6 +81,7 @@ export default function Home() {
   if (wheel.winner && status === "轉盤旋轉中…") {
     setMapTarget(wheel.winner);
     setStatus(`今天吃：${wheel.winner.name}`);
+    setIsWinnerModalOpen(true);
   }
 
   const handleRandomize = useCallback(() => {
@@ -143,15 +146,17 @@ export default function Home() {
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
-        {/* Winner Card - most prominent when visible */}
-        {wheel.winner && (
-          <WinnerCard
-            winner={wheel.winner}
-            isFavorite={favs.isFavorite(wheel.winner.id)}
-            onAddFavorite={handleAddFavoriteFromWinner}
-            onViewOnMap={() => handleViewOnMap(wheel.winner!)}
-          />
-        )}
+        {/* Winner Modal */}
+        <WinnerCard
+          winner={wheel.winner}
+          isFavorite={wheel.winner ? favs.isFavorite(wheel.winner.id) : false}
+          isOpen={isWinnerModalOpen}
+          onClose={() => setIsWinnerModalOpen(false)}
+          onAddFavorite={handleAddFavoriteFromWinner}
+          onViewOnMap={() => {
+            if (wheel.winner) handleViewOnMap(wheel.winner);
+          }}
+        />
 
         {/* Main 2-column layout */}
         <div className="grid gap-6 lg:grid-cols-5">
