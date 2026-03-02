@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# What To Eat
 
-## Getting Started
+## 專案概述
 
-First, run the development server:
+**What To Eat** 是一個純前端的餐廳推薦工具，幫助使用者決定要吃什麼。  
+應用程式透過使用者的 GPS 位置，串接 Google Maps API 取得附近餐廳資料，並以轉盤動畫隨機推薦餐廳。
+
+---
+
+## 技術棧
+
+| 項目 | 技術 |
+|------|------|
+| 框架 | Next.js (App Router) |
+| 語言 | TypeScript |
+| 樣式 | Tailwind CSS |
+| 本地儲存 | IndexedDB（透過 `idb` 套件管理） |
+| 外部 API | Google Maps Places API |
+| 後端 | 無（純前端，所有資料存於使用者瀏覽器） |
+
+---
+
+## 核心功能
+
+### 1. 位置取得
+- 使用瀏覽器的 Geolocation API 取得使用者目前座標。
+
+### 2. 附近餐廳搜尋
+- 呼叫 Google Maps Places API，以使用者位置為中心，分別搜尋半徑 **100m / 300m / 500m** 範圍內的餐廳。
+- 預設行為：使用者進入應用程式後，直接觸發隨機推薦流程（假設使用者無法自行決定）。
+
+### 3. 隨機推薦（轉盤動畫）
+- 從搜尋到的餐廳清單中隨機挑選一家推薦給使用者。
+- 介面以**旋轉轉盤**呈現動畫效果：
+  - 轉盤格子顯示附近餐廳的名稱與圖片。
+  - 轉盤快速旋轉數秒後，停在最終推薦的餐廳上。
+  - 轉盤清單最多10個
+  - 轉盤清單可以由使用者挑選或是由系統從搜尋到的餐廳清單中隨機選擇
+
+### 4. 收藏清單（我的最愛）
+- 使用者可將喜歡的餐廳加入收藏清單。
+- 收藏資料儲存於本地 **IndexedDB**，使用 `idb` 套件進行 CRUD 操作。
+- 收藏的餐廳可作為：
+  - **直接選擇**：使用者主動從清單中選一家。
+  - **加入隨機池**：將收藏餐廳納入轉盤，參與隨機推薦。
+
+---
+
+## 設計規範
+
+- **RWD（響應式設計）**：必須支援手機、平板、桌機等不同裝置尺寸。
+- **動畫**：轉盤旋轉動畫需流暢，以增加互動趣味性。
+- **無後端架構**：所有資料（收藏清單等）皆存於使用者瀏覽器的 IndexedDB，不依賴任何伺服器儲存。
+
+---
+
+## 資料流概覽
+
+```
+使用者開啟應用程式
+  → 取得 GPS 位置（Geolocation API）
+  → 查詢附近餐廳（Google Maps Places API，100m / 300m / 500m）
+  → 顯示轉盤動畫，隨機停在一家餐廳
+  → 使用者可收藏餐廳 → 儲存至 IndexedDB
+  → 下次可從收藏清單直接選擇，或加入隨機轉盤
+```
+
+---
+
+## 本地開發
+
+### 1. 安裝依賴
+
+```bash
+npm install
+```
+
+### 2. 設定環境變數
+
+建立 `.env.local`：
+
+```bash
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=你的_google_maps_api_key
+```
+
+### 3. 啟動開發伺服器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 目前 MVP 實作狀態
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 已完成定位、附近餐廳查詢流程、轉盤抽選、收藏清單（IndexedDB）。
+- 轉盤清單支援「系統隨機產生」與「使用者手動勾選」，上限 10 家。
+- 若未設定 Google API Key 或 API 呼叫失敗，前端會切換到模擬資料模式，方便持續開發 UI/互動流程。
