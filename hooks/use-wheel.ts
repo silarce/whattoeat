@@ -95,9 +95,10 @@ export function useWheel() {
     });
 
     let ticks = 0;
-    let current = 0;
+    // 第一幀時用 Fisher-Yates 建立動畫路徑，放在 closure 中
+    const path: number[] = [];
+    let pathIndex = 0;
 
-    // 需要在函式外取得最新的 items
     timerRef.current = window.setInterval(() => {
       setState((prev) => {
         if (!prev.isSpinning) {
@@ -105,22 +106,28 @@ export function useWheel() {
           return prev;
         }
 
-        current = (current + 1) % prev.items.length;
+        // 第一幀：用 pickRandom 建立隨機動畫路徑，重複填滿所需幀數
+        if (path.length === 0) {
+          const base = pickRandom(prev.items.map((_, i) => i), prev.items.length);
+          while (path.length < WHEEL_TOTAL_TICKS) {
+            path.push(...base);
+          }
+        }
+
         ticks += 1;
+        const currentIndex = path[pathIndex++ % path.length];
 
         if (ticks >= WHEEL_TOTAL_TICKS) {
           if (timerRef.current) window.clearInterval(timerRef.current);
-          const finalIndex = Math.floor(Math.random() * prev.items.length);
-          const selected = prev.items[finalIndex];
           return {
             ...prev,
-            selectedIndex: finalIndex,
-            winner: selected,
+            selectedIndex: currentIndex,
+            winner: prev.items[currentIndex],
             isSpinning: false,
           };
         }
 
-        return { ...prev, selectedIndex: current };
+        return { ...prev, selectedIndex: currentIndex };
       });
     }, WHEEL_TICK_INTERVAL);
   }, []);
