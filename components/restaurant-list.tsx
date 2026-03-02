@@ -14,6 +14,7 @@ type RestaurantListProps = {
   totalPages: number;
   onPageChange: (page: number) => void;
   manualWheelIds: string[];
+  favoriteIds: string[];
   onToggleWheel: (id: string) => void;
   onSelect: (restaurant: Restaurant) => void;
   onViewOnMap: (restaurant: Restaurant) => void;
@@ -26,6 +27,7 @@ export function RestaurantList({
   totalPages,
   onPageChange,
   manualWheelIds,
+  favoriteIds,
   onToggleWheel,
   onSelect,
   onViewOnMap,
@@ -53,11 +55,12 @@ export function RestaurantList({
           <div className="space-y-2">
             {pagedRestaurants.map((restaurant) => {
               const checked = manualWheelIds.includes(restaurant.id);
+              const isFav = favoriteIds.includes(restaurant.id);
               return (
                 <div
                   key={restaurant.id}
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl border px-4 py-3 transition-all",
+                    "flex items-center gap-3 rounded-xl border px-4 py-3 transition-all",
                     checked
                       ? "border-orange-200 bg-orange-50"
                       : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
@@ -82,20 +85,29 @@ export function RestaurantList({
                     )}
                   </div>
 
-                  <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex shrink-0 items-center gap-1">
+                    <span
+                      className={cn("text-base leading-none", !isFav && "invisible")}
+                      aria-label="已收藏"
+                      aria-hidden={!isFav}
+                    >
+                      ❤️
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onViewOnMap(restaurant)}
+                      title="在地圖上查看"
                     >
-                      📍
+                      🗺️
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onSelect(restaurant)}
+                      title="選擇此餐廳"
                     >
-                      ✅
+                      ℹ️
                     </Button>
                   </div>
                 </div>

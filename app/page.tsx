@@ -236,6 +236,7 @@ export default function Home() {
               totalPages={searchHook.totalPages}
               onPageChange={searchHook.setPage}
               manualWheelIds={manualWheelIds}
+              favoriteIds={favs.favorites.map((f) => f.id)}
               onToggleWheel={handleToggleWheel}
               onSelect={handleSelectRestaurant}
               onViewOnMap={handleViewOnMap}
