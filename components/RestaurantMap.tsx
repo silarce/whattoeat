@@ -8,6 +8,7 @@ type RestaurantMapProps = {
   apiKey: string;
   location: { lat: number; lng: number };
   restaurants: Restaurant[];
+  selectedRestaurant: Restaurant | null;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
@@ -15,6 +16,7 @@ export default function RestaurantMap({
   apiKey,
   location,
   restaurants,
+  selectedRestaurant,
   onSelectRestaurant,
 }: RestaurantMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -22,12 +24,52 @@ export default function RestaurantMap({
   const mapsModuleRef = useRef<typeof google.maps | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const locationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
   // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
   const [mapReady, setMapReady] = useState(false);
 
   const onSelectRef = useRef(onSelectRestaurant);
   onSelectRef.current = onSelectRestaurant;
+
+  /** 開啟 InfoWindow 並顯示餐廳資訊 — 用 ref 儲存避免 useCallback 順序問題 */
+  const openInfoWindowFn = useCallback(
+    (anchor: google.maps.marker.AdvancedMarkerElement, restaurant: Restaurant) => {
+      const mapsModule = mapsModuleRef.current;
+      const map = mapInstanceRef.current;
+      if (!mapsModule || !map) return;
+
+      if (!infoWindowRef.current) {
+        infoWindowRef.current = new mapsModule.InfoWindow();
+      }
+
+      const mapsUrl = restaurant.lat && restaurant.lng
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)}&query_place_id=${restaurant.id}`
+        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)}`;
+
+      infoWindowRef.current.setContent(
+        `<div style="font-family:'Google Sans',Roboto,Arial,sans-serif;min-width:160px;max-width:240px;padding:0">
+          <div style="padding:12px 14px 4px">
+            <div style="font-size:16px;font-weight:500;color:#202124;line-height:1.3;margin-bottom:4px">${restaurant.name}</div>
+            ${restaurant.address
+              ? `<div style="font-size:13px;color:#70757a;line-height:1.4;margin-top:4px">${restaurant.address}</div>`
+              : ""}
+          </div>
+          <div style="border-top:1px solid #e8eaed;margin-top:8px;padding:8px 14px">
+            <a href="${mapsUrl}" target="_blank" rel="noopener"
+              style="font-size:13px;color:#1a73e8;text-decoration:none;font-weight:400">
+              在 Google 地圖上查看
+            </a>
+          </div>
+        </div>`,
+      );
+
+      infoWindowRef.current.open({ anchor, map });
+    },
+    [],
+  );
+  const openInfoWindowRef = useRef(openInfoWindowFn);
+  openInfoWindowRef.current = openInfoWindowFn;
 
   // 1) 初始化地圖
   useEffect(() => {
@@ -128,6 +170,7 @@ export default function RestaurantMap({
 
       marker.addEventListener("gmp-click", () => {
         onSelectRef.current(restaurant);
+        openInfoWindowRef.current(marker, restaurant);
         map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
         map.setZoom(17);
       });
@@ -149,12 +192,31 @@ export default function RestaurantMap({
   // 4) 地圖就緒 + restaurants 改變 → 更新 markers
   useEffect(() => {
     if (!mapReady) return;
-    // 小延遲確保地圖 tiles 已載入
     const timer = setTimeout(() => {
       updateMarkers();
     }, 100);
     return () => clearTimeout(timer);
   }, [mapReady, restaurants, updateMarkers]);
+
+  // 5) selectedRestaurant 改變 → focus 並開啟 InfoWindow
+  useEffect(() => {
+    if (!mapReady || !selectedRestaurant) return;
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (selectedRestaurant.lat && selectedRestaurant.lng) {
+      map.panTo({ lat: selectedRestaurant.lat, lng: selectedRestaurant.lng });
+      map.setZoom(17);
+
+      // 找出對應的 marker 並開啟 InfoWindow
+      const marker = markersRef.current.find(
+        (m) => m.title === selectedRestaurant.name,
+      );
+      if (marker) {
+        openInfoWindowRef.current(marker, selectedRestaurant);
+      }
+    }
+  }, [mapReady, selectedRestaurant]);
 
   return (
     <div

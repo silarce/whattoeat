@@ -51,6 +51,7 @@ export function MapSection({
             apiKey={apiKey}
             location={location}
             restaurants={restaurants}
+            selectedRestaurant={mapTarget}
             onSelectRestaurant={onSelectRestaurant}
           />
         ) : (
