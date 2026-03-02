@@ -59,11 +59,19 @@ export function useWheel() {
       }
       return { ...prev, items: [...prev.items, item] };
     });
-  }, []);
+  }, []); 
 
   /** 直接挑選某餐廳為贏家 (不經轉盤動畫) */
   const pickDirect = useCallback((restaurant: Restaurant) => {
-    setState((prev) => ({ ...prev, winner: restaurant }));
+    setState((prev) => {
+      const nextIndex = prev.items.findIndex((item) => item.id === restaurant.id);
+      return {
+        ...prev,
+        selectedIndex: nextIndex >= 0 ? nextIndex : prev.selectedIndex,
+        winner: restaurant,
+        isSpinning: false,
+      };
+    });
   }, []);
 
   /** 立即選出贏家 (搜尋後自動抽選) */

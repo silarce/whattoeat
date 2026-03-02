@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
+import { CardContainer, CardBody, CardHeader, Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
 
@@ -11,6 +10,7 @@ type WheelSectionProps = {
   isSpinning: boolean;
   onSpin: () => void;
   onRandomize: () => void;
+  onSelect?: (restaurant: Restaurant) => void;
 };
 
 export function WheelSection({
@@ -19,6 +19,7 @@ export function WheelSection({
   isSpinning,
   onSpin,
   onRandomize,
+  onSelect,
 }: WheelSectionProps) {
   return (
     <CardContainer>
@@ -48,26 +49,12 @@ export function WheelSection({
         ) : (
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
             {items.map((item, index) => (
-              <div
+              <Card
                 key={item.id}
-                className={cn(
-                  "relative overflow-hidden rounded-xl border-2 px-3 py-3 text-center transition-all duration-150",
-                  index === selectedIndex
-                    ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-100 scale-105"
-                    : "border-gray-100 bg-gray-50 hover:border-gray-200",
-                )}
-              >
-                <p
-                  className={cn(
-                    "line-clamp-2 text-xs font-medium leading-tight",
-                    index === selectedIndex
-                      ? "text-orange-900"
-                      : "text-gray-700",
-                  )}
-                >
-                  {item.name}
-                </p>
-              </div>
+                name={item.name}
+                isSelected={index === selectedIndex}
+                onClick={() => onSelect?.(item)}
+              />
             ))}
           </div>
         )}

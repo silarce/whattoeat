@@ -120,6 +120,7 @@ export default function Home() {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
       setStatus(`你選擇了：${restaurant.name}`);
+      setIsWinnerModalOpen(true);
     },
     [wheel],
   );
@@ -168,6 +169,7 @@ export default function Home() {
               isSpinning={wheel.isSpinning}
               onSpin={handleSpin}
               onRandomize={handleRandomize}
+              onSelect={handleSelectRestaurant}
             />
 
             {/* Map */}
