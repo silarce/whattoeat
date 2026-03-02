@@ -42,12 +42,20 @@ export default function RestaurantMap({
         // 如果地圖已存在，不重建
         if (mapInstanceRef.current) return;
 
+        // 確保 Google Maps 已完全載入
+        if (!window.google?.maps) {
+          console.error("Google Maps API not loaded");
+          return;
+        }
+
         const map = new mapsModule.Map(mapRef.current, {
           zoom: 16,
           center: { lat: location.lat, lng: location.lng },
           mapTypeControl: false,
           fullscreenControl: false,
           streetViewControl: false,
+          // AdvancedMarkerElement 必須提供 mapId，使用 Google 官方測試 ID
+          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
         });
 
         mapInstanceRef.current = map;
@@ -72,6 +80,11 @@ export default function RestaurantMap({
     map.panTo({ lat: location.lat, lng: location.lng });
 
     // 更新或建立位置 marker
+    if (!mapsModule.marker?.AdvancedMarkerElement) {
+      console.warn("AdvancedMarkerElement not available, skipping location marker");
+      return;
+    }
+
     if (locationMarkerRef.current) {
       locationMarkerRef.current.position = {
         lat: location.lat,
@@ -104,6 +117,12 @@ export default function RestaurantMap({
 
     restaurants.forEach((restaurant) => {
       if (!restaurant.lat || !restaurant.lng) return;
+
+      // 禺量使用 AdvancedMarkerElement，需要確保 marker 庫已載入
+      if (!mapsModule.marker?.AdvancedMarkerElement) {
+        console.warn("AdvancedMarkerElement not available, skipping custom markers");
+        return;
+      }
 
       const markerElement = document.createElement("div");
       markerElement.innerHTML =
@@ -150,7 +169,7 @@ export default function RestaurantMap({
         if (mapInstanceRef.current && mapsModuleRef.current) {
           clearInterval(timer);
           // 放置位置 marker
-          if (!locationMarkerRef.current) {
+          if (!locationMarkerRef.current && mapsModuleRef.current?.marker?.AdvancedMarkerElement) {
             const markerElement = document.createElement("div");
             markerElement.innerHTML =
               '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#4A90E2" stroke="white" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="white"/></svg>';
