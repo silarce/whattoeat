@@ -11,7 +11,6 @@ type HeaderProps = {
   hasLocation: boolean;
   radius: number;
   onLocate: () => void;
-  onSearch: () => void;
   onRadiusChange: (radius: number) => void;
 };
 
@@ -22,7 +21,6 @@ export function Header({
   hasLocation,
   radius,
   onLocate,
-  onSearch,
   onRadiusChange,
 }: HeaderProps) {
   return (
@@ -36,9 +34,9 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 flex-col gap-3 sm:items-end">
-          {/* Radius selector */}
+          {/* Radius selector + Locate button */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">搜尋半徑</span>
+            <span className="text-base font-medium text-gray-700">搜尋餐廳</span>
             <div className="flex rounded-lg border border-gray-200 p-0.5">
               {SEARCH_RADII.map((r) => (
                 <button
@@ -56,19 +54,8 @@ export function Header({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-2">
             <Button variant="secondary" onClick={onLocate} disabled={isLocating}>
-              {isLocating ? "定位中…" : "📍 定位"}
-            </Button>
-            <Button
-              variant="primary"
-              onClick={onSearch}
-              disabled={!hasLocation || isSearching}
-            >
-              {isSearching ? "搜尋中…" : "🔍 搜尋附近餐廳"}
+              {isLocating ? "定位中…" : "🔄 重新定位"}
             </Button>
           </div>
         </div>

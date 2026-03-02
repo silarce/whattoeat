@@ -157,37 +157,17 @@ export default function RestaurantMap({
     }
   }, [restaurants, location.lat, location.lng]);
 
+  // 當 restaurants 改變時，用小延遲確保地圖完全初始化、markers 庫已載入
   useEffect(() => {
-    updateMarkers();
-  }, [updateMarkers]);
+    if (!mapInstanceRef.current || !mapsModuleRef.current) return;
 
-  // 地圖載入後首次標記 (等初始化完成)
-  useEffect(() => {
-    // 輪詢等待 map 就緒後放置 markers
-    if (!mapInstanceRef.current) {
-      const timer = setInterval(() => {
-        if (mapInstanceRef.current && mapsModuleRef.current) {
-          clearInterval(timer);
-          // 放置位置 marker
-          if (!locationMarkerRef.current && mapsModuleRef.current?.marker?.AdvancedMarkerElement) {
-            const markerElement = document.createElement("div");
-            markerElement.innerHTML =
-              '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#4A90E2" stroke="white" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="white"/></svg>';
-            locationMarkerRef.current = new mapsModuleRef.current.marker.AdvancedMarkerElement({
-              position: { lat: location.lat, lng: location.lng },
-              map: mapInstanceRef.current,
-              title: "目前位置",
-              content: markerElement,
-            });
-          }
-          updateMarkers();
-        }
-      }, 100);
+    // 使用小延遲，確保地圖、maps module、markers 庫都就緒
+    const timer = setTimeout(() => {
+      updateMarkers();
+    }, 100);
 
-      return () => clearInterval(timer);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => clearTimeout(timer);
+  }, [restaurants, updateMarkers]);
 
   return (
     <div

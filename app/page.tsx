@@ -35,6 +35,25 @@ export default function Home() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 定位成功且這是首次時，自動搜尋 100m 内的餐廳
+  useEffect(() => {
+    if (geo.location && searchHook.restaurants.length === 0 && !searchHook.isSearching) {
+      const location = geo.location;
+      (async () => {
+        setStatus("搜尋附近餐廳中…");
+        const results = await searchHook.search(location, 100);
+        if (results.length === 0) {
+          setStatus("附近找不到餐廳，請改變半徑或位置");
+          return;
+        }
+        const picked = wheel.fillRandom(results);
+        setManualWheelIds([]);
+        setStatus(`已找到 ${results.length} 家餐廳，你可以點擊轉盤來選擇`);
+      })();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.location]);
+
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   // --- Derived status message ---
@@ -50,7 +69,7 @@ export default function Home() {
   // Update status when location changes
   const locationStatus =
     geo.location && !geo.isLocating
-      ? "定位成功，可開始搜尋附近餐廳"
+      ? "定位成功，請設定事始半徑並搜尋餐廳"
       : undefined;
 
   const handleSearch = useCallback(async () => {
@@ -67,30 +86,20 @@ export default function Home() {
       return;
     }
 
-    // Fill wheel and auto-select
+    // 只填入轉盤，不自動投丫推荐
     const picked = wheel.fillRandom(results);
     setManualWheelIds([]);
-    setStatus(`已找到 ${results.length} 家餐廳，正在抽選…`);
-
-    setTimeout(() => {
-      const winner = wheel.autoSelect(picked);
-      setMapTarget(winner);
-      setStatus(`推薦：${winner.name}`);
-      setIsWinnerModalOpen(true);
-    }, AUTO_SPIN_DELAY);
+    setStatus(`已找到 ${results.length} 家餐廳，你可以鑿擋鐫馬來骋馬`);
   }, [geo.location, searchHook, wheel, radius]);
 
   const handleSpin = useCallback(() => {
+    if (wheel.items.length === 0) {
+      setStatus("就儀並沒有餐廳，請先搜尋");
+      return;
+    }
     wheel.spin();
     setStatus("轉盤旋轉中…");
   }, [wheel]);
-
-  // Watch for spin completion
-  if (wheel.winner && status === "轉盤旋轉中…") {
-    setMapTarget(wheel.winner);
-    setStatus(`今天吃：${wheel.winner.name}`);
-    setIsWinnerModalOpen(true);
-  }
 
   const handleRandomize = useCallback(() => {
     if (searchHook.restaurants.length === 0) {
@@ -152,8 +161,24 @@ export default function Home() {
         hasLocation={!!geo.location}
         radius={radius}
         onLocate={handleLocate}
-        onSearch={handleSearch}
-        onRadiusChange={setRadius}
+        onRadiusChange={(newRadius) => {
+          setRadius(newRadius);
+          // 切換半徑時立即執行搜尋
+          if (geo.location) {
+            const location = geo.location;
+            (async () => {
+              setStatus("搜尋附近餐廳中…");
+              const results = await searchHook.search(location, newRadius);
+              if (results.length === 0) {
+                setStatus("附近找不到餐廳，請嘗試其他地點");
+                return;
+              }
+              const picked = wheel.fillRandom(results);
+              setManualWheelIds([]);
+              setStatus(`已找到 ${results.length} 家餐廳，你可以鑿擋鐫馬來骋馬`);
+            })();
+          }
+        }}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
