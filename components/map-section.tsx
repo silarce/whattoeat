@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { LatLng, Restaurant } from "@/types/restaurant";
 import RestaurantMap from "@/components/RestaurantMap";
@@ -26,7 +26,7 @@ export function MapSection({
       : "https://www.google.com/maps";
 
   return (
-    <Card>
+    <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">🗺️ 地圖</h2>
@@ -61,6 +61,6 @@ export function MapSection({
           </div>
         )}
       </CardBody>
-    </Card>
+    </CardContainer>
   );
 }

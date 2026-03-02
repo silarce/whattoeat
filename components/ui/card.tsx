@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 type CardProps = HTMLAttributes<HTMLDivElement>;
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
+const CardContainer = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
@@ -15,7 +15,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
     />
   ),
 );
-Card.displayName = "Card";
+CardContainer.displayName = "Card";
 
 const CardHeader = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
@@ -39,4 +39,4 @@ const CardBody = forwardRef<HTMLDivElement, CardProps>(
 );
 CardBody.displayName = "CardBody";
 
-export { Card, CardHeader, CardBody };
+export { CardContainer, CardHeader, CardBody };

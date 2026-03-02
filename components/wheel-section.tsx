@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
 
@@ -21,7 +21,7 @@ export function WheelSection({
   onRandomize,
 }: WheelSectionProps) {
   return (
-    <Card>
+    <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">🎰 轉盤抽選</h2>
@@ -72,6 +72,6 @@ export function WheelSection({
           </div>
         )}
       </CardBody>
-    </Card>
+    </CardContainer>
   );
 }

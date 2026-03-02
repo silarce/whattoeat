@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { FavoriteRestaurant } from "@/types/restaurant";
@@ -19,7 +19,7 @@ export function FavoritesSection({
   onRemove,
 }: FavoritesSectionProps) {
   return (
-    <Card>
+    <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">❤️ 我的收藏</h2>
@@ -72,6 +72,6 @@ export function FavoritesSection({
           </div>
         )}
       </CardBody>
-    </Card>
+    </CardContainer>
   );
 }

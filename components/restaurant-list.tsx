@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
@@ -23,7 +23,7 @@ export function RestaurantList({
   onViewOnMap,
 }: RestaurantListProps) {
   return (
-    <Card>
+    <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">📋 附近餐廳</h2>
@@ -95,6 +95,6 @@ export function RestaurantList({
           </div>
         )}
       </CardBody>
-    </Card>
+    </CardContainer>
   );
 }
