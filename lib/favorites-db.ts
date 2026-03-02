@@ -1,13 +1,7 @@
 import { openDB } from "idb";
+import type { FavoriteRestaurant } from "@/types/restaurant";
 
-export type FavoriteRestaurant = {
-  id: string;
-  name: string;
-  photoUrl?: string;
-  address?: string;
-  lat?: number;
-  lng?: number;
-};
+export type { FavoriteRestaurant };
 
 type WhatToEatDB = {
   favorites: {

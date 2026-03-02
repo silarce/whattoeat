@@ -5,8 +5,8 @@ import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import type { Restaurant } from "@/types/restaurant";
 
 type RestaurantMapProps = {
-  apiKey: string | undefined;
-  location: { lat: number; lng: number } | null;
+  apiKey: string;
+  location: { lat: number; lng: number };
   restaurants: Restaurant[];
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
@@ -22,22 +22,14 @@ export default function RestaurantMap({
   const markersRef = useRef<google.maps.Marker[]>([]);
 
   useEffect(() => {
-    // 確保有足夠的資訊
-    if (!apiKey || !location || !mapRef.current) {
-      return;
-    }
+    if (!mapRef.current) return;
 
-    // 調試：檢查餐廳資料
-    console.log("RestaurantMap - Restaurants data:", restaurants);
-    console.log(
-      "RestaurantMap - Restaurants with coords:",
-      restaurants.filter((r) => r.lat && r.lng),
-    );
+    let cancelled = false;
 
-    // 非同步載入 Google Maps 並初始化
     (async () => {
       try {
         const mapsModule = await loadGoogleMaps(apiKey);
+        if (cancelled) return;
         initializeMap(mapsModule);
       } catch (error) {
         console.error("Failed to load Google Maps:", error);
@@ -45,9 +37,8 @@ export default function RestaurantMap({
     })();
 
     function initializeMap(mapsModule: typeof google.maps) {
-      if (!mapRef.current || !location) return;
+      if (!mapRef.current || cancelled) return;
 
-      // 初始化地圖
       const map = new mapsModule.Map(mapRef.current, {
         zoom: 16,
         center: { lat: location.lat, lng: location.lng },
@@ -59,10 +50,10 @@ export default function RestaurantMap({
       mapInstanceRef.current = map;
 
       // 清除舊 marker
-      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
 
-      // 添加目前位置 marker
+      // 目前位置 marker
       const currentMarker = new mapsModule.Marker({
         position: { lat: location.lat, lng: location.lng },
         map,
@@ -71,7 +62,7 @@ export default function RestaurantMap({
       });
       markersRef.current.push(currentMarker);
 
-      // 添加餐廳 marker
+      // 餐廳 markers
       restaurants.forEach((restaurant) => {
         if (!restaurant.lat || !restaurant.lng) return;
 
@@ -81,7 +72,6 @@ export default function RestaurantMap({
           title: restaurant.name,
         });
 
-        // 點擊 marker 時選擇該餐廳
         marker.addListener("click", () => {
           onSelectRestaurant(restaurant);
           map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
@@ -91,27 +81,25 @@ export default function RestaurantMap({
         markersRef.current.push(marker);
       });
 
-      // 自動調整地圖邊界以容納所有 marker
+      // 自動調整邊界
       if (restaurants.length > 0) {
         const bounds = new mapsModule.LatLngBounds(
           { lat: location.lat, lng: location.lng },
-          { lat: location.lat, lng: location.lng }
+          { lat: location.lat, lng: location.lng },
         );
 
         markersRef.current.forEach((marker) => {
           const pos = marker.getPosition();
-          if (pos) {
-            bounds.extend(pos);
-          }
+          if (pos) bounds.extend(pos);
         });
 
         map.fitBounds(bounds, 50);
       }
     }
 
-    // cleanup
     return () => {
-      markersRef.current.forEach((marker) => marker.setMap(null));
+      cancelled = true;
+      markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
     };
   }, [apiKey, location, restaurants, onSelectRestaurant]);
@@ -119,8 +107,8 @@ export default function RestaurantMap({
   return (
     <div
       ref={mapRef}
-      className="h-96 w-full rounded-xl border border-black/15"
-      style={{ minHeight: "400px" }}
+      className="h-80 w-full rounded-xl sm:h-96"
+      style={{ minHeight: "320px" }}
     />
   );
 }
