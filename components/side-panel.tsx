@@ -74,6 +74,7 @@ export function SidePanel({
           </TabsList>
         </CardHeader>
 
+
         <TabsContent value="restaurants">
           <RestaurantList
             totalCount={totalCount}
@@ -101,6 +102,7 @@ export function SidePanel({
             onRemove={onRemoveFavorite}
           />
         </TabsContent>
+
       </Tabs>
     </CardContainer>
   );

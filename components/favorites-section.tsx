@@ -19,7 +19,7 @@ export function FavoritesSection({
   onRemove,
 }: FavoritesSectionProps) {
   return (
-    <CardBody>
+    <CardBody className="h-[600px] overflow-auto">
       {favorites.length === 0 ? (
         <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
           <p className="text-sm text-gray-500">選好餐廳後點「加入收藏」即可保存</p>

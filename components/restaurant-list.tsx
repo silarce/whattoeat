@@ -61,7 +61,7 @@ export function RestaurantList({
           )}
         </div>
       </CardHeader>
-      <CardBody>
+      <CardBody className="h-130.5 overflow-auto pb-0">
         {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
             <p className="text-sm text-gray-500">點擊「搜尋附近餐廳」開始探索</p>
@@ -143,7 +143,7 @@ export function RestaurantList({
 
             {/* 翻頁控制 */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div className="flex items-center justify-between border-t border-gray-100 pt-3 sticky bottom-0 pb-5 bg-white">
                 <Button
                   variant="ghost"
                   size="sm"
