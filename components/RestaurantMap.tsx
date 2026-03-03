@@ -159,20 +159,27 @@ export default function RestaurantMap({
       if (!restaurant.lat || !restaurant.lng) return;
 
       const el = document.createElement("div");
+      el.style.cursor = "pointer";
+      el.style.width = "32px";
+      el.style.height = "44px"; // 加高讓點擊更容易命中（尖端向下）
       el.innerHTML =
-        '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 16 12 16s12-9 12-16c0-6.63-5.37-12-12-12z" fill="#FF6B35" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
+        '<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="#FF6B35" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
+
+      const handleClick = () => {
+        // onSelectRef.current(restaurant);
+        openInfoWindowRef.current(marker, restaurant);
+        map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
+        map.setZoom(17);
+      };
+
+      // 綁在 DOM 元素上，點擊判定為整個 div 框，不受 SVG 路徑輪廓限制
+      el.addEventListener("click", handleClick);
+
       const marker = new mapsModule.marker.AdvancedMarkerElement({
         position: { lat: restaurant.lat, lng: restaurant.lng },
         map,
         title: restaurant.name,
         content: el,
-      });
-
-      marker.addEventListener("gmp-click", () => {
-        onSelectRef.current(restaurant);
-        openInfoWindowRef.current(marker, restaurant);
-        map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
-        map.setZoom(17);
       });
 
       markersRef.current.push(marker);
