@@ -177,6 +177,27 @@ export function filterByDistance(
 }
 
 /**
+ * 依距離由近到遠排序（無座標的項目排到最後）
+ */
+export function sortByDistance(
+  restaurants: Restaurant[],
+  lat: number,
+  lng: number,
+): Restaurant[] {
+  return [...restaurants].sort((a, b) => {
+    const da =
+      a.lat != null && a.lng != null
+        ? distanceInMeters(lat, lng, a.lat, a.lng)
+        : Infinity;
+    const db =
+      b.lat != null && b.lng != null
+        ? distanceInMeters(lat, lng, b.lat, b.lng)
+        : Infinity;
+    return da - db;
+  });
+}
+
+/**
  * 產生模擬餐廳資料 (API 不可用時的 fallback)
  */
 export function createMockRestaurants(

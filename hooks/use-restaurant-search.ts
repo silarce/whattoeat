@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { LatLng, Restaurant } from "@/types/restaurant";
-import { searchAllNearby, filterByDistance, createMockRestaurants } from "@/lib/places-api";
+import { searchAllNearby, filterByDistance, sortByDistance, createMockRestaurants } from "@/lib/places-api";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS } from "@/lib/constants";
 
@@ -43,7 +43,10 @@ export function useRestaurantSearch() {
 
       // 預設先用「近」過濾
       const nearBand = DISTANCE_BANDS.find((b) => b.key === "near")!;
-      const filtered = filterByDistance(results, location.lat, location.lng, nearBand.maxMeters);
+      const filtered = sortByDistance(
+        filterByDistance(results, location.lat, location.lng, nearBand.maxMeters),
+        location.lat, location.lng,
+      );
 
       setState({ allRestaurants: results, restaurants: filtered, isSearching: false, error: null });
       return { all: results, filtered };
@@ -63,7 +66,10 @@ export function useRestaurantSearch() {
   const applyBand = useCallback((band: DistanceBandKey, location: LatLng) => {
     setState((prev) => {
       const bandDef = DISTANCE_BANDS.find((b) => b.key === band)!;
-      const filtered = filterByDistance(prev.allRestaurants, location.lat, location.lng, bandDef.maxMeters);
+      const filtered = sortByDistance(
+        filterByDistance(prev.allRestaurants, location.lat, location.lng, bandDef.maxMeters),
+        location.lat, location.lng,
+      );
       return { ...prev, restaurants: filtered };
     });
   }, []);
