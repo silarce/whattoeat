@@ -9,14 +9,12 @@ type WinnerCardProps = {
   winner: Restaurant;
   checkIsFavorite: () => boolean;
   onAddFavorite: () => Promise<void> | void;
-  onViewOnMap: () => void;
 };
 
 export function WinnerCard({
   winner,
   checkIsFavorite,
   onAddFavorite,
-  onViewOnMap,
 }: WinnerCardProps) {
   const close = useModalClose();
   const [isFavorite, setIsFavorite] = useState(() => checkIsFavorite());
@@ -50,14 +48,6 @@ export function WinnerCard({
 
         {/* Actions */}
         <div className="space-y-2">
-          <Button
-            variant="primary"
-            size="md"
-            onClick={() => { onViewOnMap(); close(); }}
-            className="w-full"
-          >
-            📍 地圖查看
-          </Button>
           <Button
             variant="secondary"
             size="md"
