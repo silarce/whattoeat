@@ -5,7 +5,7 @@ import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
-import { MAX_WHEEL_ITEMS } from "@/lib/constants";
+import { MAX_WHEEL_ITEMS, DISTANCE_BANDS, type DistanceBandKey } from "@/lib/constants";
 
 type RestaurantListProps = {
   totalCount: number;
@@ -15,9 +15,13 @@ type RestaurantListProps = {
   onPageChange: (page: number) => void;
   manualWheelIds: string[];
   favoriteIds: string[];
+  band: DistanceBandKey;
+  hasLocation: boolean;
+  isSearching: boolean;
   onToggleWheel: (id: string) => void;
   onSelect: (restaurant: Restaurant) => void;
   onViewOnMap: (restaurant: Restaurant) => void;
+  onBandChange: (band: DistanceBandKey) => void;
 };
 
 export function RestaurantList({
@@ -28,9 +32,13 @@ export function RestaurantList({
   onPageChange,
   manualWheelIds,
   favoriteIds,
+  band,
+  hasLocation,
+  isSearching,
   onToggleWheel,
   onSelect,
   onViewOnMap,
+  onBandChange,
 }: RestaurantListProps) {
 
   return (
@@ -38,13 +46,19 @@ export function RestaurantList({
       <CardHeader>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">📋 附近餐廳</h2>
-          <Badge variant="info">{totalCount} 家</Badge>
+          <div className="flex items-center gap-4">
+            <DistanceControl onBandChange={onBandChange} hasLocation={hasLocation} isSearching={isSearching} band={band} />
+            <Badge variant="info">{totalCount} 間</Badge>
+          </div>
         </div>
-        {totalCount > 0 && (
-          <p className="mt-1 text-xs text-gray-500">
-            勾選可手動加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
-          </p>
-        )}
+        <div className="mt-2 flex items-center justify-between">
+
+          {totalCount > 0 && (
+            <p className="text-xs text-gray-500">
+              勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
+            </p>
+          )}
+        </div>
       </CardHeader>
       <CardBody>
         {totalCount === 0 ? (
@@ -143,4 +157,43 @@ export function RestaurantList({
       </CardBody>
     </CardContainer>
   );
+}
+
+
+const DistanceControl = (
+  { onBandChange,
+    hasLocation,
+    isSearching,
+    band,
+
+  }: {
+    onBandChange: RestaurantListProps["onBandChange"];
+    hasLocation: RestaurantListProps["hasLocation"];
+    isSearching: RestaurantListProps["isSearching"];
+    band: RestaurantListProps["band"];
+  }
+) => {
+  return (
+    <div className="flex rounded-lg border border-gray-200 p-0.5">
+      {DISTANCE_BANDS.map((b) => (
+        <button
+          key={b.key}
+          type="button"
+          onClick={() => onBandChange(b.key)}
+          disabled={!hasLocation || isSearching}
+          className={cn(
+            "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+            band === b.key
+              ? "bg-orange-500 text-white"
+              : "text-gray-600 hover:bg-gray-100",
+          )}
+        >
+          {b.label}
+        </button>
+      ))}
+    </div>
+  )
+
+
+
 }

@@ -17,13 +17,13 @@ import { SidePanel } from "@/components/side-panel";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 
 export default function Home() {
-  // --- Hooks ---
+  // region  --- Hooks ---
   const geo = useGeolocation();
   const searchHook = useRestaurantSearch();
   const wheel = useWheel();
   const favs = useFavorites();
 
-  // --- Local state ---
+  // region --- Local state ---
   const [status, setStatus] = useState("定位中…");
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
@@ -186,16 +186,18 @@ export default function Home() {
     }
   }, [wheel.isSpinning, wheel.winner, handleSelectRestaurant]);
 
+
+
+
+// region --- Render ---
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
         status={locationStatus ?? displayStatus}
         isLocating={geo.isLocating}
-        isSearching={searchHook.isSearching}
-        hasLocation={!!geo.location}
-        band={band}
+        hasFailed={!!geo.error || geo.permissionDenied}
         onLocate={handleLocate}
-        onBandChange={handleBandChange}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
@@ -236,9 +238,13 @@ export default function Home() {
               onPageChange={searchHook.setPage}
               manualWheelIds={manualWheelIds}
               favoriteIds={favs.favorites.map((f) => f.id)}
+              band={band}
+              hasLocation={!!geo.location}
+              isSearching={searchHook.isSearching}
               onToggleWheel={handleToggleWheel}
               onSelect={handleSelectRestaurant}
               onViewOnMap={handleViewOnMap}
+              onBandChange={handleBandChange}
               favorites={favs.favorites}
               onAddToWheel={wheel.addItem}
               onRemoveFavorite={favs.remove}

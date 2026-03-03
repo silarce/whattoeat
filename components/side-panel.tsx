@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RestaurantList } from "@/components/restaurant-list";
 import { FavoritesSection } from "@/components/favorites-section";
 import type { Restaurant, FavoriteRestaurant } from "@/types/restaurant";
+import type { DistanceBandKey } from "@/lib/constants";
 
 type SidePanelProps = {
   // RestaurantList props
@@ -16,9 +17,13 @@ type SidePanelProps = {
   onPageChange: (page: number) => void;
   manualWheelIds: string[];
   favoriteIds: string[];
+  band: DistanceBandKey;
+  hasLocation: boolean;
+  isSearching: boolean;
   onToggleWheel: (id: string) => void;
   onSelect: (restaurant: Restaurant) => void;
   onViewOnMap: (restaurant: Restaurant | FavoriteRestaurant) => void;
+  onBandChange: (band: DistanceBandKey) => void;
 
   // FavoritesSection props
   favorites: FavoriteRestaurant[];
@@ -34,9 +39,13 @@ export function SidePanel({
   onPageChange,
   manualWheelIds,
   favoriteIds,
+  band,
+  hasLocation,
+  isSearching,
   onToggleWheel,
   onSelect,
   onViewOnMap,
+  onBandChange,
   favorites,
   onAddToWheel,
   onRemoveFavorite,
@@ -72,9 +81,13 @@ export function SidePanel({
             onPageChange={onPageChange}
             manualWheelIds={manualWheelIds}
             favoriteIds={favoriteIds}
+            band={band}
+            hasLocation={hasLocation}
+            isSearching={isSearching}
             onToggleWheel={onToggleWheel}
             onSelect={onSelect}
             onViewOnMap={onViewOnMap}
+            onBandChange={onBandChange}
           />
         </TabsContent>
 
