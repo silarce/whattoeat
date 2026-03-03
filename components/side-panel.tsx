@@ -3,6 +3,7 @@
 import { CardContainer, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { RestaurantList } from "@/components/restaurant-list";
 import { FavoritesSection } from "@/components/favorites-section";
 import type { Restaurant, FavoriteRestaurant } from "@/types/restaurant";
@@ -51,7 +52,8 @@ export function SidePanel({
   onRemoveFavorite,
 }: SidePanelProps) {
   return (
-    <CardContainer>
+    <CardContainer className="relative">
+      <LoadingOverlay isLoading={isSearching} message="正在取得店家資料…" />
       <Tabs defaultValue="restaurants">
         <CardHeader>
           <TabsList>
