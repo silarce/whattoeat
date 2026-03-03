@@ -25,6 +25,8 @@ export default function RestaurantMap({
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const locationMarkerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const labelsRef = useRef<HTMLElement[]>([]);
+  const zoomListenerRef = useRef<google.maps.MapsEventListener | null>(null);
 
   // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
   const [mapReady, setMapReady] = useState(false);
@@ -152,27 +154,63 @@ export default function RestaurantMap({
 
     markersRef.current.forEach((m) => { m.map = null; });
     markersRef.current = [];
+    labelsRef.current = [];
+
+    // 移除舊的 zoom 監聽器
+    if (zoomListenerRef.current) {
+      zoomListenerRef.current.remove();
+      zoomListenerRef.current = null;
+    }
 
     if (!mapsModule.marker?.AdvancedMarkerElement) return;
+
+    // zoom 閾值：超過此值就隱藏 label（Google 地圖已顯示 POI 名稱）
+    const LABEL_HIDE_ZOOM = 18;
 
     restaurants.forEach((restaurant) => {
       if (!restaurant.lat || !restaurant.lng) return;
 
+      // 外層容器：label 在上、pin SVG 在下
       const el = document.createElement("div");
-      el.style.cursor = "pointer";
-      el.style.width = "32px";
-      el.style.height = "44px"; // 加高讓點擊更容易命中（尖端向下）
-      el.innerHTML =
-        '<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="#FF6B35" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
+      el.style.cssText = "display:flex;flex-direction:column;align-items:center;cursor:pointer;";
+
+      // 名稱 label
+      const label = document.createElement("div");
+      const shortName = restaurant.name.length > 12
+        ? restaurant.name.slice(0, 12) + "…"
+        : restaurant.name;
+      label.textContent = shortName;
+      label.style.cssText = [
+        "max-width:110px",
+        "padding:2px 6px",
+        "border-radius:4px",
+        "background:transparent",
+        "font-size:13px",
+        "font-weight:600",
+        "color:#e18646",
+        "white-space:nowrap",
+        "overflow:hidden",
+        "text-overflow:ellipsis",
+        "margin-bottom:2px",
+        "pointer-events:none",
+        "-webkit-text-stroke:2.5px white",
+        "paint-order:stroke fill",
+      ].join(";");
+
+      // pin SVG
+      const pinEl = document.createElement("div");
+      pinEl.innerHTML =
+        '<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="#e18646" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
+
+      el.appendChild(label);
+      el.appendChild(pinEl);
+      labelsRef.current.push(label);
 
       const handleClick = () => {
-        // onSelectRef.current(restaurant); // 點擊跳出資訊modal
         openInfoWindowRef.current(marker, restaurant);
         map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
-        map.setZoom(17);
+        map.setZoom(18);
       };
-
-      // 綁在 DOM 元素上，點擊判定為整個 div 框，不受 SVG 路徑輪廓限制
       el.addEventListener("click", handleClick);
 
       const marker = new mapsModule.marker.AdvancedMarkerElement({
@@ -194,6 +232,17 @@ export default function RestaurantMap({
       });
       map.fitBounds(bounds, 50);
     }
+
+    // 根據 zoom 同步 label 可見性
+    const syncLabels = () => {
+      const zoom = map.getZoom() ?? 0;
+      const visible = zoom < LABEL_HIDE_ZOOM;
+      labelsRef.current.forEach((lbl) => {
+        lbl.style.display = visible ? "" : "none";
+      });
+    };
+    syncLabels();
+    zoomListenerRef.current = mapsModule.event.addListener(map, "zoom_changed", syncLabels);
   }, [restaurants, location.lat, location.lng]);
 
   // 4) 地圖就緒 + restaurants 改變 → 更新 markers
@@ -202,7 +251,13 @@ export default function RestaurantMap({
     const timer = setTimeout(() => {
       updateMarkers();
     }, 100);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (zoomListenerRef.current) {
+        zoomListenerRef.current.remove();
+        zoomListenerRef.current = null;
+      }
+    };
   }, [mapReady, restaurants, updateMarkers]);
 
   // 5) selectedRestaurant 改變 → focus 並開啟 InfoWindow
@@ -213,7 +268,7 @@ export default function RestaurantMap({
 
     if (selectedRestaurant.lat && selectedRestaurant.lng) {
       map.panTo({ lat: selectedRestaurant.lat, lng: selectedRestaurant.lng });
-      map.setZoom(17);
+      map.setZoom(18);
 
       // 找出對應的 marker 並開啟 InfoWindow
       const marker = markersRef.current.find(
