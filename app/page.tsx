@@ -15,6 +15,7 @@ import { WinnerCard } from "@/components/winner-card";
 import { showModal } from "@/lib/show-modal";
 import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
+import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
@@ -29,6 +30,7 @@ export default function Home() {
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // 掛載後自動定位
   useEffect(() => {
@@ -169,10 +171,11 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
-        // status={locationStatus ?? displayStatus}
         isLocating={geo.isLocating}
         hasFailed={!!geo.error || geo.permissionDenied}
         onLocate={handleLocate}
+        onOpenDrawer={() => setDrawerOpen(true)}
+        restaurantCount={searchHook.restaurants.length}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 overflow-hidden">
@@ -204,7 +207,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="min-w-0 lg:col-span-2">
+          <div className="hidden min-w-0 lg:col-span-2 lg:block">
             <SidePanel
               totalCount={searchHook.restaurants.length}
               pagedRestaurants={searchHook.pagedRestaurants}
@@ -230,6 +233,33 @@ export default function Home() {
             />
           </div>
         </div>
+
+        {/* Mobile / Tablet Drawer */}
+        <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <SidePanel
+            totalCount={searchHook.restaurants.length}
+            pagedRestaurants={searchHook.pagedRestaurants}
+            page={searchHook.page}
+            totalPages={searchHook.totalPages}
+            onPageChange={searchHook.setPage}
+            manualWheelIds={manualWheelIds}
+            favoriteIds={favs.favorites.map((f) => f.id)}
+            band={band}
+            hasLocation={!!geo.location}
+            isSearching={searchHook.isSearching}
+            onToggleWheel={handleToggleWheel}
+            onSelect={(r) => { handleSelectRestaurant(r); setDrawerOpen(false); }}
+            onViewOnMap={(r) => { handleViewOnMap(r); setDrawerOpen(false); }}
+            onBandChange={handleBandChange}
+            favorites={favs.favorites}
+            pagedFavorites={favs.pagedFavorites}
+            favPage={favs.page}
+            favTotalPages={favs.totalPages}
+            onFavPageChange={favs.setPage}
+            onAddToWheel={wheel.addItem}
+            onRemoveFavorite={favs.remove}
+          />
+        </Drawer>
       </main>
     </div>
   );
