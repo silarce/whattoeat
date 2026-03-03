@@ -27,24 +27,6 @@ export function MapSection({
 
   return (
     <CardContainer>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">🗺️ 地圖</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(openMapUrl, "_blank")}
-          >
-            在 Google 地圖開啟 ↗
-          </Button>
-        </div>
-        {mapTarget && (
-          <p className="mt-1 text-xs text-gray-500">
-            目前目標：
-            <span className="font-medium text-gray-900">{mapTarget.name}</span>
-          </p>
-        )}
-      </CardHeader>
       <CardBody>
         {apiKey && location ? (
           <RestaurantMap

@@ -20,11 +20,6 @@ export function LocationPermissionModal({
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl focus:outline-none">
           <div className="space-y-4">
-            {/* Icon */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-2xl">
-              📍
-            </div>
-
             {/* Title */}
             <div>
               <Dialog.Title className="text-lg font-bold text-gray-900">
