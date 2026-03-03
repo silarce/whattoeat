@@ -18,6 +18,7 @@ import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { useMediaQuery } from "usehooks-ts";
 
 export default function Home() {
   // region  --- Hooks ---
@@ -31,6 +32,7 @@ export default function Home() {
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   // 掛載後自動定位
   useEffect(() => {
@@ -207,7 +209,38 @@ export default function Home() {
             />
           </div>
 
-          <div className="hidden min-w-0 lg:col-span-2 lg:block">
+          {isDesktop && (
+            <div className="min-w-0 lg:col-span-2">
+              <SidePanel
+                totalCount={searchHook.restaurants.length}
+                pagedRestaurants={searchHook.pagedRestaurants}
+                page={searchHook.page}
+                totalPages={searchHook.totalPages}
+                onPageChange={searchHook.setPage}
+                manualWheelIds={manualWheelIds}
+                favoriteIds={favs.favorites.map((f) => f.id)}
+                band={band}
+                hasLocation={!!geo.location}
+                isSearching={searchHook.isSearching}
+                onToggleWheel={handleToggleWheel}
+                onSelect={handleSelectRestaurant}
+                onViewOnMap={handleViewOnMap}
+                onBandChange={handleBandChange}
+                favorites={favs.favorites}
+                pagedFavorites={favs.pagedFavorites}
+                favPage={favs.page}
+                favTotalPages={favs.totalPages}
+                onFavPageChange={favs.setPage}
+                onAddToWheel={wheel.addItem}
+                onRemoveFavorite={favs.remove}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Mobile / Tablet Drawer */}
+        {!isDesktop && (
+          <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
             <SidePanel
               totalCount={searchHook.restaurants.length}
               pagedRestaurants={searchHook.pagedRestaurants}
@@ -220,8 +253,8 @@ export default function Home() {
               hasLocation={!!geo.location}
               isSearching={searchHook.isSearching}
               onToggleWheel={handleToggleWheel}
-              onSelect={handleSelectRestaurant}
-              onViewOnMap={handleViewOnMap}
+              onSelect={(r) => { handleSelectRestaurant(r); setDrawerOpen(false); }}
+              onViewOnMap={(r) => { handleViewOnMap(r); setDrawerOpen(false); }}
               onBandChange={handleBandChange}
               favorites={favs.favorites}
               pagedFavorites={favs.pagedFavorites}
@@ -231,35 +264,8 @@ export default function Home() {
               onAddToWheel={wheel.addItem}
               onRemoveFavorite={favs.remove}
             />
-          </div>
-        </div>
-
-        {/* Mobile / Tablet Drawer */}
-        <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
-          <SidePanel
-            totalCount={searchHook.restaurants.length}
-            pagedRestaurants={searchHook.pagedRestaurants}
-            page={searchHook.page}
-            totalPages={searchHook.totalPages}
-            onPageChange={searchHook.setPage}
-            manualWheelIds={manualWheelIds}
-            favoriteIds={favs.favorites.map((f) => f.id)}
-            band={band}
-            hasLocation={!!geo.location}
-            isSearching={searchHook.isSearching}
-            onToggleWheel={handleToggleWheel}
-            onSelect={(r) => { handleSelectRestaurant(r); setDrawerOpen(false); }}
-            onViewOnMap={(r) => { handleViewOnMap(r); setDrawerOpen(false); }}
-            onBandChange={handleBandChange}
-            favorites={favs.favorites}
-            pagedFavorites={favs.pagedFavorites}
-            favPage={favs.page}
-            favTotalPages={favs.totalPages}
-            onFavPageChange={favs.setPage}
-            onAddToWheel={wheel.addItem}
-            onRemoveFavorite={favs.remove}
-          />
-        </Drawer>
+          </Drawer>
+        )}
       </main>
     </div>
   );
