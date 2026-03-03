@@ -12,6 +12,11 @@ type RestaurantMapProps = {
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
+// zoom 閾值：超過此值就隱藏自訂 label（預留給 Google 原生 POI 標籤）
+const LABEL_HIDE_ZOOM = 20;
+// 點擊 marker / 選取餐廳時，地圖縮放到的目標 zoom（街道等級）
+const RESTAURANT_FOCUS_ZOOM = 17;
+
 export default function RestaurantMap({
   apiKey,
   location,
@@ -54,8 +59,8 @@ export default function RestaurantMap({
           <div style="padding:12px 14px 4px">
             <div style="font-size:16px;font-weight:500;color:#202124;line-height:1.3;margin-bottom:4px">${restaurant.name}</div>
             ${restaurant.address
-              ? `<div style="font-size:13px;color:#70757a;line-height:1.4;margin-top:4px">${restaurant.address}</div>`
-              : ""}
+          ? `<div style="font-size:13px;color:#70757a;line-height:1.4;margin-top:4px">${restaurant.address}</div>`
+          : ""}
           </div>
           <div style="border-top:1px solid #e8eaed;margin-top:8px;padding:8px 14px">
             <a href="${mapsUrl}" target="_blank" rel="noopener"
@@ -164,8 +169,7 @@ export default function RestaurantMap({
 
     if (!mapsModule.marker?.AdvancedMarkerElement) return;
 
-    // zoom 閾值：超過此值就隱藏 label（Google 地圖已顯示 POI 名稱）
-    const LABEL_HIDE_ZOOM = 18;
+
 
     restaurants.forEach((restaurant) => {
       if (!restaurant.lat || !restaurant.lng) return;
@@ -209,7 +213,7 @@ export default function RestaurantMap({
       const handleClick = () => {
         openInfoWindowRef.current(marker, restaurant);
         map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
-        map.setZoom(18);
+        map.setZoom(RESTAURANT_FOCUS_ZOOM);
       };
       el.addEventListener("click", handleClick);
 
@@ -268,7 +272,7 @@ export default function RestaurantMap({
 
     if (selectedRestaurant.lat && selectedRestaurant.lng) {
       map.panTo({ lat: selectedRestaurant.lat, lng: selectedRestaurant.lng });
-      map.setZoom(18);
+      map.setZoom(RESTAURANT_FOCUS_ZOOM);
 
       // 找出對應的 marker 並開啟 InfoWindow
       const marker = markersRef.current.find(
