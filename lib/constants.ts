@@ -13,6 +13,9 @@ export const API_SEARCH_RADIUS = 1200;
 /** 轉盤最大項目數 */
 export const MAX_WHEEL_ITEMS = 10;
 
+/** 列表每頁顯示筆數 */
+export const PAGE_SIZE = 10;
+
 /** 轉盤動畫總 tick 數 */
 export const WHEEL_TOTAL_TICKS = 26;
 

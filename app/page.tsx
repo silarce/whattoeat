@@ -248,6 +248,10 @@ export default function Home() {
               onViewOnMap={handleViewOnMap}
               onBandChange={handleBandChange}
               favorites={favs.favorites}
+              pagedFavorites={favs.pagedFavorites}
+              favPage={favs.page}
+              favTotalPages={favs.totalPages}
+              onFavPageChange={favs.setPage}
               onAddToWheel={wheel.addItem}
               onRemoveFavorite={favs.remove}
             />

@@ -8,6 +8,7 @@ import {
   addFavorite as dbAdd,
   removeFavorite as dbRemove,
 } from "@/lib/favorites-db";
+import { PAGE_SIZE } from "@/lib/constants";
 
 /**
  * 封裝 IndexedDB 收藏管理的 hook
@@ -15,6 +16,7 @@ import {
 export function useFavorites() {
   const [favorites, setFavorites] = useState<FavoriteRestaurant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     getFavorites()
@@ -47,5 +49,23 @@ export function useFavorites() {
     setFavorites(next);
   }, []);
 
-  return { favorites, isLoading, isFavorite, add, remove };
+  const totalPages = Math.max(1, Math.ceil(favorites.length / PAGE_SIZE));
+  const safePage = page >= totalPages ? 0 : page;
+
+  const pagedFavorites = useMemo(
+    () => favorites.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
+    [favorites, safePage],
+  );
+
+  return {
+    favorites,
+    isLoading,
+    isFavorite,
+    add,
+    remove,
+    pagedFavorites,
+    page: safePage,
+    totalPages,
+    setPage,
+  };
 }

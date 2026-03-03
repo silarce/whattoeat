@@ -28,6 +28,10 @@ type SidePanelProps = {
 
   // FavoritesSection props
   favorites: FavoriteRestaurant[];
+  pagedFavorites: FavoriteRestaurant[];
+  favPage: number;
+  favTotalPages: number;
+  onFavPageChange: (page: number) => void;
   onAddToWheel: (fav: FavoriteRestaurant) => void;
   onRemoveFavorite: (id: string) => void;
 };
@@ -48,6 +52,10 @@ export function SidePanel({
   onViewOnMap,
   onBandChange,
   favorites,
+  pagedFavorites,
+  favPage,
+  favTotalPages,
+  onFavPageChange,
   onAddToWheel,
   onRemoveFavorite,
 }: SidePanelProps) {
@@ -97,6 +105,10 @@ export function SidePanel({
         <TabsContent value="favorites">
           <FavoritesSection
             favorites={favorites}
+            pagedFavorites={pagedFavorites}
+            page={favPage}
+            totalPages={favTotalPages}
+            onPageChange={onFavPageChange}
             onAddToWheel={onAddToWheel}
             onViewOnMap={onViewOnMap}
             onRemove={onRemoveFavorite}
