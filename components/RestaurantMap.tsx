@@ -166,7 +166,7 @@ export default function RestaurantMap({
         '<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="#FF6B35" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
 
       const handleClick = () => {
-        // onSelectRef.current(restaurant);
+        // onSelectRef.current(restaurant); // 點擊跳出資訊modal
         openInfoWindowRef.current(marker, restaurant);
         map.panTo({ lat: restaurant.lat!, lng: restaurant.lng! });
         map.setZoom(17);
