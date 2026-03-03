@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,7 +114,13 @@ export function RestaurantList({
                       onClick={() => onViewOnMap(restaurant)}
                       title="在地圖上查看"
                     >
-                      🗺️
+                      <Image
+                        src="/icons/map-pin.svg"
+                        alt="地圖標記"
+                        width={24}
+                        height={24}
+                        className="text-gray-600"
+                      />
                     </Button>
                     <Button
                       variant="ghost"
@@ -121,7 +128,13 @@ export function RestaurantList({
                       onClick={() => onSelect(restaurant)}
                       title="選擇此餐廳"
                     >
-                      ℹ️
+                      <Image
+                        src="/icons/info.svg"
+                        alt="詳細資訊"
+                        width={24}
+                        height={24}
+                        className="text-gray-600"
+                      />
                     </Button>
                   </div>
                 </div>
@@ -193,7 +206,6 @@ const DistanceControl = (
       ))}
     </div>
   )
-
-
-
 }
+
+
