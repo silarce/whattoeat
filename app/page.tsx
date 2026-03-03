@@ -15,6 +15,7 @@ import { showWinnerCard } from "@/lib/show-winner-card";
 import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
 export default function Home() {
   // region  --- Hooks ---
@@ -193,6 +194,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
         status={locationStatus ?? displayStatus}
         isLocating={geo.isLocating}
