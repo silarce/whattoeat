@@ -58,12 +58,12 @@ export default function Home() {
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   // --- Derived status message ---
-  const displayStatus = geo.error ?? status;
+  // const displayStatus = geo.error ?? status;
 
-  const locationStatus =
-    geo.location && !geo.isLocating
-      ? "定位成功，請選擇距離帶搜尋餐廳"
-      : undefined;
+  // const locationStatus =
+  //   geo.location && !geo.isLocating
+  //     ? "定位成功，請選擇距離帶搜尋餐廳"
+  //     : undefined;
 
   // --- Handlers ---
   const handleLocate = useCallback(() => {
@@ -196,7 +196,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
-        status={locationStatus ?? displayStatus}
+        // status={locationStatus ?? displayStatus}
         isLocating={geo.isLocating}
         hasFailed={!!geo.error || geo.permissionDenied}
         onLocate={handleLocate}
