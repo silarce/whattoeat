@@ -24,7 +24,7 @@ function ModalShell({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
@@ -32,7 +32,7 @@ function ModalShell({
         onClick={onClose}
       />
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 w-full max-w-md">
         {children}
       </div>
     </div>

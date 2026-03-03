@@ -59,9 +59,9 @@ export function WinnerCard({
   return (
     <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
       {/* 頂部橫幅 */}
-      <div className="bg-linear-to-r from-orange-500 to-orange-400 px-6 py-4">
+      <div className="bg-linear-to-r from-orange-500 to-orange-400 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center justify-between">
-          <p className="text-3xl font-bold text-orange-100 tracking-wide">🎉 今天就吃這家！ <span className="inline-block rotate-y-180">🎉</span></p>
+          <p className="text-xl sm:text-3xl font-bold text-orange-100 tracking-wide">🎉 今天就吃這家！ <span className="inline-block rotate-y-180">🎉</span></p>
           <button
             onClick={close}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
@@ -70,14 +70,14 @@ export function WinnerCard({
             ✕
           </button>
         </div>
-        <h2 className="mt-2 text-2xl font-bold text-white leading-tight">
+        <h2 className="mt-2 text-lg sm:text-2xl font-bold text-white leading-tight">
           {winner.name}
         </h2>
         {winner.rating && <StarRating rating={winner.rating} />}
       </div>
 
       {/* 資訊區 */}
-      <div className="px-6 py-4 space-y-2.5">
+      <div className="px-4 py-3 space-y-2.5 sm:px-6 sm:py-4">
         {winner.openNow !== undefined && (
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full shrink-0 ${winner.openNow ? "bg-green-500" : "bg-red-400"}`} />
@@ -103,7 +103,7 @@ export function WinnerCard({
       </div>
 
       {/* 操作區 */}
-      <div className="px-6 pb-6 space-y-2">
+      <div className="px-4 pb-4 space-y-2 sm:px-6 sm:pb-6">
         {winner.id && (
           <Button
             variant="primary"

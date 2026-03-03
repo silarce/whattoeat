@@ -53,23 +53,20 @@ export function RestaurantList({
   return (
     <CardContainer>
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">📋 附近餐廳</h2>
-          <div className="flex items-center gap-4">
-            <DistanceControl onBandChange={onBandChange} hasLocation={hasLocation} isSearching={isSearching} band={band} />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900">📋 附近餐廳</h2>
             <Badge variant="info">{totalCount} 間</Badge>
           </div>
+          <DistanceControl onBandChange={onBandChange} hasLocation={hasLocation} isSearching={isSearching} band={band} />
         </div>
-        <div className="mt-2 flex items-center justify-between">
-
-          {totalCount > 0 && (
-            <p className="text-xs text-gray-500">
-              勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
-            </p>
-          )}
-        </div>
+        {totalCount > 0 && (
+          <p className="mt-2 text-xs text-gray-500">
+            勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
+          </p>
+        )}
       </CardHeader>
-      <CardBody className="h-130.5 pb-0 flex flex-col">
+      <CardBody className="h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-130.5 pb-0 flex flex-col">
         {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
             <p className="text-sm text-gray-500">點擊「搜尋附近餐廳」開始探索</p>
@@ -84,7 +81,7 @@ export function RestaurantList({
                 <div
                   key={restaurant.id}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl border px-4 py-3 transition-all",
+                    "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
                     checked
                       ? "border-orange-200 bg-orange-50"
                       : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
@@ -94,7 +91,7 @@ export function RestaurantList({
                     type="checkbox"
                     checked={checked}
                     onChange={() => onToggleWheel(restaurant.id)}
-                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer"
                     aria-label={`加入轉盤：${restaurant.name}`}
                   />
 
@@ -109,9 +106,9 @@ export function RestaurantList({
                     )}
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1">
+                  <div className="flex shrink-0 items-center">
                     <span
-                      className={cn("text-base leading-none", !isFav && "invisible")}
+                      className={cn("text-base leading-none", !isFav && "hidden")}
                       aria-label="已收藏"
                       aria-hidden={!isFav}
                     >
@@ -119,29 +116,31 @@ export function RestaurantList({
                     </span>
                     <Button
                       variant="ghost"
-                      size="lg"
+                      size="sm"
                       onClick={() => onViewOnMap(restaurant)}
                       title="在地圖上查看"
+                      className="min-h-11 min-w-11 px-2"
                     >
                       <Image
                         src="/icons/map-pin.svg"
                         alt="地圖標記"
-                        width={24}
-                        height={24}
+                        width={20}
+                        height={20}
                         className="text-gray-600"
                       />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="lg"
+                      size="sm"
                       onClick={() => onSelect(restaurant)}
                       title="選擇此餐廳"
+                      className="min-h-11 min-w-11 px-2"
                     >
                       <Image
                         src="/icons/info.svg"
                         alt="詳細資訊"
-                        width={24}
-                        height={24}
+                        width={20}
+                        height={20}
                         className="text-gray-600"
                       />
                     </Button>
@@ -182,7 +181,7 @@ const DistanceControl = (
           onClick={() => onBandChange(b.key)}
           disabled={!hasLocation || isSearching}
           className={cn(
-            "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+            "rounded-md px-3 py-2 text-xs font-medium transition-colors min-h-11 min-w-11",
             "cursor-pointer",
             band === b.key
               ? "bg-orange-500 text-white"

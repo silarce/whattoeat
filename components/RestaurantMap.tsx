@@ -221,8 +221,8 @@ export default function RestaurantMap({
   return (
     <div
       ref={mapRef}
-      className="h-80 w-full rounded-xl sm:h-96"
-      style={{ minHeight: "320px" }}
+      className="h-64 w-full rounded-xl sm:h-80 md:h-96 lg:h-[28rem]"
+      style={{ minHeight: "256px" }}
     />
   );
 }

@@ -24,9 +24,9 @@ export function WheelSection({
   return (
     <CardContainer>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900">🎰 餐廳抽選</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
             <Button variant="ghost" size="lg" onClick={onRandomize}>
               🔀 抽十個
             </Button>
@@ -47,7 +47,7 @@ export function WheelSection({
             <p className="text-sm text-gray-500">搜尋餐廳後，會自動填入轉盤</p>
           </div>
         ) : (
-          <div className="h-32 grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
+          <div className="grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
             {items.map((item, index) => (
               <Card
                 key={item.id}

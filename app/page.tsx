@@ -166,7 +166,7 @@ export default function Home() {
 // region --- Render ---
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
         // status={locationStatus ?? displayStatus}
@@ -175,7 +175,7 @@ export default function Home() {
         onLocate={handleLocate}
       />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 overflow-hidden">
         {/* Location Permission Modal */}
         <LocationPermissionModal
           isOpen={geo.permissionDenied}
@@ -184,8 +184,8 @@ export default function Home() {
         />
 
         {/* Main 2-column layout */}
-        <div className="grid gap-6 lg:grid-cols-5">
-          <div className="space-y-6 lg:col-span-3">
+        <div className="grid gap-6 md:grid-cols-5">
+          <div className="min-w-0 space-y-6 md:col-span-3">
             <WheelSection
               items={wheel.items}
               selectedIndex={wheel.selectedIndex}
@@ -204,7 +204,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="min-w-0 md:col-span-2">
             <SidePanel
               totalCount={searchHook.restaurants.length}
               pagedRestaurants={searchHook.pagedRestaurants}

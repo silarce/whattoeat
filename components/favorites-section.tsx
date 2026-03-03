@@ -36,7 +36,7 @@ export function FavoritesSection({
   };
 
   return (
-    <CardBody className="h-[600px] pb-0 flex flex-col">
+    <CardBody className="h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-150 pb-0 flex flex-col">
       {favorites.length === 0 ? (
         <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
           <p className="text-sm text-gray-500">選好餐廳後點「加入收藏」即可保存</p>
@@ -48,7 +48,7 @@ export function FavoritesSection({
               <div
                 key={item.id}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl border px-4 py-3 transition-all",
+                  "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
                   "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
                 )}
               >
@@ -63,12 +63,13 @@ export function FavoritesSection({
                   )}
                 </div>
 
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 items-center">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onAddToWheel(item)}
                     title="加入轉盤"
+                    className="min-h-11 min-w-11 px-2"
                   >
                     🎰
                   </Button>
@@ -77,6 +78,7 @@ export function FavoritesSection({
                     size="sm"
                     onClick={() => onViewOnMap(item)}
                     title="在地圖上查看"
+                    className="min-h-11 min-w-11 px-2"
                   >
                     🗺️
                   </Button>
@@ -85,6 +87,7 @@ export function FavoritesSection({
                     size="sm"
                     onClick={() => onRemove(item.id)}
                     title="移除收藏"
+                    className="min-h-11 min-w-11 px-2"
                   >
                     🗑️
                   </Button>

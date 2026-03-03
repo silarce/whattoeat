@@ -38,7 +38,7 @@ const CardContainer = forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5",
+        "rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 overflow-hidden",
         className,
       )}
       {...props}
@@ -62,7 +62,7 @@ const CardBody = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("px-5 py-4 sm:px-6", className)}
+      className={cn("px-5 py-4 sm:px-6 min-w-0", className)}
       {...props}
     />
   ),
