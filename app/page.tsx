@@ -26,7 +26,6 @@ export default function Home() {
   const favs = useFavorites();
 
   // region --- Local state ---
-  const [status, setStatus] = useState("定位中…");
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
@@ -42,15 +41,12 @@ export default function Home() {
     if (geo.location && searchHook.allRestaurants.length === 0 && !searchHook.isSearching) {
       const location = geo.location;
       (async () => {
-        setStatus("搜尋附近餐廳中…");
         const { filtered } = await searchHook.search(location);
         if (filtered.length === 0) {
-          setStatus("附近找不到餐廳，試試切換距離帶");
           return;
         }
         wheel.fillRandom(filtered);
         setManualWheelIds([]);
-        setStatus(`已找到 ${filtered.length} 家餐廳`);
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,18 +54,9 @@ export default function Home() {
 
   const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  // --- Derived status message ---
-  // const displayStatus = geo.error ?? status;
-
-  // const locationStatus =
-  //   geo.location && !geo.isLocating
-  //     ? "定位成功，請選擇距離帶搜尋餐廳"
-  //     : undefined;
-
   // --- Handlers ---
   const handleLocate = useCallback(() => {
     geo.locate();
-    setStatus("定位中…");
   }, [geo]);
 
   /** 切換距離帶 — 純 client 端過濾，不再打 API */
@@ -84,17 +71,12 @@ export default function Home() {
       // 如果還沒搜尋過，先打一次 API
       if (searchHook.allRestaurants.length === 0) {
         (async () => {
-          setStatus("搜尋附近餐廳中…");
           const { all } = await searchHook.search(location);
-          // search 預設用 "near"，這邊再套用目標 band
           searchHook.applyBand(newBand, location);
           const filtered = filterByDistance(all, location.lat, location.lng, bandDef.maxMeters);
           if (filtered.length > 0) {
             wheel.fillRandom(filtered);
             setManualWheelIds([]);
-            setStatus(`「${bandDef.label}」找到 ${filtered.length} 家餐廳`);
-          } else {
-            setStatus(`「${bandDef.label}」範圍內沒有餐廳`);
           }
         })();
         return;
@@ -112,31 +94,20 @@ export default function Home() {
       if (filtered.length > 0) {
         wheel.fillRandom(filtered);
         setManualWheelIds([]);
-        setStatus(`「${bandDef.label}」找到 ${filtered.length} 家餐廳`);
-      } else {
-        setStatus(`「${bandDef.label}」範圍內沒有餐廳，試試其他距離`);
       }
     },
     [geo.location, searchHook, wheel],
   );
 
   const handleSpin = useCallback(() => {
-    if (wheel.items.length === 0) {
-      setStatus("轉盤裡沒有餐廳，請先搜尋");
-      return;
-    }
+    if (wheel.items.length === 0) return;
     wheel.spin();
-    setStatus("轉盤旋轉中…");
   }, [wheel]);
 
   const handleRandomize = useCallback(() => {
-    if (searchHook.restaurants.length === 0) {
-      setStatus("目前沒有餐廳資料，請先搜尋");
-      return;
-    }
+    if (searchHook.restaurants.length === 0) return;
     wheel.fillRandom(searchHook.restaurants);
     setManualWheelIds([]);
-    setStatus("已重新隨機產生轉盤內容");
   }, [searchHook.restaurants, wheel]);
 
   const handleToggleWheel = useCallback(
@@ -163,7 +134,6 @@ export default function Home() {
     (restaurant: Restaurant) => {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
-      setStatus(`你選擇了：${restaurant.name}`);
       showModal(
         <WinnerCard
           winner={restaurant}

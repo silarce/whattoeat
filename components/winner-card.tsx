@@ -57,11 +57,11 @@ export function WinnerCard({
   };
 
   return (
-    <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
+    <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
       {/* 頂部橫幅 */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-400 px-6 py-4">
+      <div className="bg-linear-to-r from-orange-500 to-orange-400 px-6 py-4">
         <div className="flex items-center justify-between">
-          <p className="text-3xl font-bold text-orange-100 tracking-wide">🎉 今天就吃這家！</p>
+          <p className="text-3xl font-bold text-orange-100 tracking-wide">🎉 今天就吃這家！ <span className="inline-block rotate-y-180">🎉</span></p>
           <button
             onClick={close}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
@@ -88,13 +88,13 @@ export function WinnerCard({
         )}
         {winner.address && (
           <div className="flex items-start gap-2 text-sm text-gray-600">
-            <span className="shrink-0 mt-0.5">📍</span>
+            <span className="shrink-0 mt-0.5">地址 : </span>
             <span>{winner.address}</span>
           </div>
         )}
         {winner.phone && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="shrink-0">📞</span>
+            <span className="shrink-0">電話 : </span>
             <a href={`tel:${winner.phone}`} className="hover:text-orange-500 transition-colors">
               {winner.phone}
             </a>
