@@ -169,6 +169,7 @@ export default function Home() {
           winner={restaurant}
           checkIsFavorite={() => favs.isFavorite(restaurant.id)}
           onAddFavorite={() => favs.add(restaurant)}
+          onRemoveFavorite={() => favs.remove(restaurant.id)}
         />,
       );
     },

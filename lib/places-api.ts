@@ -37,6 +37,9 @@ type PlaceResponse = {
     formattedAddress?: string;
     photos?: Array<{ name: string }>;
     location?: { latitude?: number; longitude?: number };
+    nationalPhoneNumber?: string;
+    rating?: number;
+    currentOpeningHours?: { openNow?: boolean };
   }>;
   nextPageToken?: string;
 };
@@ -64,6 +67,9 @@ function parsePlaces(
         photoUrl,
         lat: place.location?.latitude,
         lng: place.location?.longitude,
+        phone: place.nationalPhoneNumber,
+        rating: place.rating,
+        openNow: place.currentOpeningHours?.openNow,
       } satisfies Restaurant;
     });
 }

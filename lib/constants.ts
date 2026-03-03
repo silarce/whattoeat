@@ -31,4 +31,4 @@ export const PLACES_API_URL =
 
 /** Places API 回傳欄位 */
 export const PLACES_FIELD_MASK =
-  "places.id,places.displayName,places.formattedAddress,places.photos,places.location";
+  "places.id,places.displayName,places.formattedAddress,places.photos,places.location,places.nationalPhoneNumber,places.rating,places.currentOpeningHours.openNow";

@@ -10,6 +10,9 @@ export type Restaurant = {
   address?: string;
   lat?: number;
   lng?: number;
+  phone?: string;
+  rating?: number;
+  openNow?: boolean;
 };
 
 export type FavoriteRestaurant = {
@@ -19,6 +22,9 @@ export type FavoriteRestaurant = {
   address?: string;
   lat?: number;
   lng?: number;
+  phone?: string;
+  rating?: number;
+  openNow?: boolean;
 };
 
 export function toFavorite(restaurant: Restaurant): FavoriteRestaurant {
@@ -29,5 +35,8 @@ export function toFavorite(restaurant: Restaurant): FavoriteRestaurant {
     address: restaurant.address,
     lat: restaurant.lat,
     lng: restaurant.lng,
+    phone: restaurant.phone,
+    rating: restaurant.rating,
+    openNow: restaurant.openNow,
   };
 }
