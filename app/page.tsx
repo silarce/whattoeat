@@ -11,7 +11,8 @@ import { useWheel } from "@/hooks/use-wheel";
 import { useFavorites } from "@/hooks/use-favorites";
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
-import { showWinnerCard } from "@/lib/show-winner-card";
+import { WinnerCard } from "@/components/winner-card";
+import { showModal } from "@/lib/show-modal";
 import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
@@ -163,12 +164,14 @@ export default function Home() {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
       setStatus(`你選擇了：${restaurant.name}`);
-      showWinnerCard({
-        winner: restaurant,
-        checkIsFavorite: () => favs.isFavorite(restaurant.id),
-        onAddFavorite: () => favs.add(restaurant),
-        onViewOnMap: () => setMapTarget(restaurant),
-      });
+      showModal(
+        <WinnerCard
+          winner={restaurant}
+          checkIsFavorite={() => favs.isFavorite(restaurant.id)}
+          onAddFavorite={() => favs.add(restaurant)}
+          onViewOnMap={() => setMapTarget(restaurant)}
+        />,
+      );
     },
     [wheel, favs],
   );
