@@ -43,11 +43,11 @@ export function WheelSection({
       </CardHeader>
       <CardBody>
         {items.length === 0 ? (
-          <div className="flex h-40 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
+          <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
             <p className="text-sm text-gray-500">搜尋餐廳後，會自動填入轉盤</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <div className="h-32 grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
             {items.map((item, index) => (
               <Card
                 key={item.id}
