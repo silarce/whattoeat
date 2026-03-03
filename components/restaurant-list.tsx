@@ -109,7 +109,7 @@ export function RestaurantList({
                     </span>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="lg"
                       onClick={() => onViewOnMap(restaurant)}
                       title="在地圖上查看"
                     >
@@ -117,7 +117,7 @@ export function RestaurantList({
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="lg"
                       onClick={() => onSelect(restaurant)}
                       title="選擇此餐廳"
                     >

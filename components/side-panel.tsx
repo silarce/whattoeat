@@ -57,7 +57,7 @@ export function SidePanel({
       <Tabs defaultValue="restaurants">
         <CardHeader>
           <TabsList>
-            <TabsTrigger value="restaurants">
+            <TabsTrigger value="restaurants" className="cursor-pointer">
               📋 附近餐廳
               {totalCount > 0 && (
                 <Badge variant="info" className="ml-1.5">
@@ -65,7 +65,7 @@ export function SidePanel({
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="favorites">
+            <TabsTrigger value="favorites" className="cursor-pointer">
               ❤️ 我的收藏
               {favorites.length > 0 && (
                 <Badge className="ml-1.5">{favorites.length}</Badge>

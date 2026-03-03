@@ -25,14 +25,14 @@ export function WheelSection({
     <CardContainer>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">🎰 轉盤抽選</h2>
+          <h2 className="text-lg font-semibold text-gray-900">🎰 餐廳抽選</h2>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={onRandomize}>
-              🔀 重新隨機
+            <Button variant="ghost" size="lg" onClick={onRandomize}>
+              🔀 抽十個
             </Button>
             <Button
               variant="primary"
-              size="sm"
+              size="lg"
               onClick={onSpin}
               disabled={isSpinning || items.length === 0}
             >
