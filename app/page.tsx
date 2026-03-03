@@ -184,8 +184,8 @@ export default function Home() {
         />
 
         {/* Main 2-column layout */}
-        <div className="grid gap-6 md:grid-cols-5">
-          <div className="min-w-0 space-y-6 md:col-span-3">
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="min-w-0 space-y-6 lg:col-span-3">
             <WheelSection
               items={wheel.items}
               selectedIndex={wheel.selectedIndex}
@@ -204,7 +204,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="min-w-0 md:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             <SidePanel
               totalCount={searchHook.restaurants.length}
               pagedRestaurants={searchHook.pagedRestaurants}
