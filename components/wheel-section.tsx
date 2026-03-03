@@ -26,10 +26,8 @@ export function WheelSection({
       <CardHeader>
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-gray-900">🎰 餐廳抽選</h2>
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-            <Button variant="ghost" size="lg" onClick={onRandomize}>
-              🔀 抽十個
-            </Button>
+          <div className="flex  gap-2 flex-row "
+          >
             <Button
               variant="primary"
               size="lg"
@@ -37,6 +35,9 @@ export function WheelSection({
               disabled={isSpinning || items.length === 0}
             >
               {isSpinning ? "旋轉中…" : "🎲 開始抽選"}
+            </Button>
+            <Button variant="secondary" size="lg" onClick={onRandomize}>
+              🔀 抽十個
             </Button>
           </div>
         </div>
