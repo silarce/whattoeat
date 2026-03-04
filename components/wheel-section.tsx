@@ -44,7 +44,7 @@ export function WheelSection({
               🔀 抽十個
             </Button>
             <Button
-              variant="ghost"
+              variant="secondary"
               size="md"
               onClick={onClear}
               disabled={items.length === 0}
