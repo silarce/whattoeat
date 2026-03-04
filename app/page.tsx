@@ -210,7 +210,7 @@ export default function Home() {
           </div>
 
           {isDesktop && (
-            <div className="min-w-0 lg:col-span-2">
+            <div className="min-w-0 lg:col-span-2 h-0 min-h-full">
               <SidePanel
                 totalCount={searchHook.restaurants.length}
                 pagedRestaurants={searchHook.pagedRestaurants}

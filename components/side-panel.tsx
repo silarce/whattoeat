@@ -60,9 +60,9 @@ export function SidePanel({
   onRemoveFavorite,
 }: SidePanelProps) {
   return (
-    <CardContainer className="relative">
+    <CardContainer className="relative h-full flex flex-col">
       <LoadingOverlay isLoading={isSearching} message="正在取得店家資料…" />
-      <Tabs defaultValue="restaurants">
+      <Tabs defaultValue="restaurants" className="flex-1 min-h-0 flex flex-col">
         <CardHeader>
           <TabsList>
             <TabsTrigger value="restaurants" className="cursor-pointer">
@@ -83,7 +83,7 @@ export function SidePanel({
         </CardHeader>
 
 
-        <TabsContent value="restaurants">
+        <TabsContent value="restaurants" className="flex-1 min-h-0 flex flex-col">
           <RestaurantList
             totalCount={totalCount}
             pagedRestaurants={pagedRestaurants}
@@ -102,7 +102,7 @@ export function SidePanel({
           />
         </TabsContent>
 
-        <TabsContent value="favorites">
+        <TabsContent value="favorites" className="flex-1 min-h-0 flex flex-col">
           <FavoritesSection
             favorites={favorites}
             pagedFavorites={pagedFavorites}

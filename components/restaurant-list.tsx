@@ -51,7 +51,7 @@ export function RestaurantList({
   };
 
   return (
-    <CardContainer>
+    <CardContainer className="flex-1 min-h-0 flex flex-col">
       <CardHeader>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export function RestaurantList({
           </p>
         )}
       </CardHeader>
-      <CardBody className="h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-130.5 pb-0 flex flex-col">
+      <CardBody className="flex-1 min-h-0 pb-0 flex flex-col">
         {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
             <p className="text-sm text-gray-500">點擊「搜尋附近餐廳」開始探索</p>
