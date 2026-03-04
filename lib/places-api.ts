@@ -88,7 +88,7 @@ const SEARCH_TYPE_GROUPS: string[][] = [
   ["restaurant"],
   ["meal_takeaway", "meal_delivery"],
   ["cafe", "bakery"],
-  ["noodle_restaurant", "taiwanese_restaurant", "dim_sum_restaurant"],
+  ["taiwanese_restaurant", "dim_sum_restaurant"],
   ["japanese_restaurant", "korean_restaurant"],
   ["breakfast_restaurant", "brunch_restaurant"],
 ];
