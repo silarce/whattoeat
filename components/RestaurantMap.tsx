@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
 import type { Restaurant } from "@/types/restaurant";
+import { makePinSvg, locationDotSvg } from "@/lib/map-icons";
 
 type RestaurantMapProps = {
   apiKey: string;
@@ -10,6 +11,7 @@ type RestaurantMapProps = {
   restaurants: Restaurant[];
   extraRestaurant?: Restaurant | null;
   selectedRestaurant: Restaurant | null;
+  isDark?: boolean;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
@@ -20,9 +22,7 @@ const RESTAURANT_FOCUS_ZOOM = 17;
 const MARKER_DEFAULT_COLOR = "#e18646";
 const MARKER_WINNER_COLOR  = "#ef4444";
 
-function makePinHtml(color: string) {
-  return `<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="${color}" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>`;
-}
+const makePinHtml = makePinSvg;
 
 function applyColorToEl(el: HTMLElement, color: string) {
   const labelDiv = el.firstElementChild as HTMLElement | null;
@@ -36,6 +36,7 @@ export default function RestaurantMap({
   restaurants,
   extraRestaurant,
   selectedRestaurant,
+  isDark = false,
   onSelectRestaurant,
 }: RestaurantMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,10 @@ export default function RestaurantMap({
 
   // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
   const [mapReady, setMapReady] = useState(false);
+
+  // isDark ref 鏡像，讓初始化的 async 閉包能讀到最新值
+  const isDarkRef = useRef(isDark);
+  isDarkRef.current = isDark;
 
   const onSelectRef = useRef(onSelectRestaurant);
   onSelectRef.current = onSelectRestaurant;
@@ -124,7 +129,9 @@ export default function RestaurantMap({
           mapTypeControl: false,
           fullscreenControl: false,
           streetViewControl: false,
-          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
+          // mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
+          mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,
+          colorScheme: isDarkRef.current ? "DARK" : "LIGHT",
         });
 
         mapInstanceRef.current = map;
@@ -140,7 +147,9 @@ export default function RestaurantMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
 
-  // 2) location 改變 or 地圖就緒 → 更新位置 marker
+  // 2) isDark 變化時元件會被 key 強制 remount，此 effect 保留備用
+
+  // 3) location 改變 or 地圖就緒 → 更新位置 marker
   useEffect(() => {
     if (!mapReady) return;
     const map = mapInstanceRef.current;
@@ -158,8 +167,7 @@ export default function RestaurantMap({
       locationMarkerRef.current.position = { lat: location.lat, lng: location.lng };
     } else {
       const el = document.createElement("div");
-      el.innerHTML =
-        '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="14" fill="#4A90E2" stroke="white" stroke-width="2"/><circle cx="16" cy="16" r="6" fill="white"/></svg>';
+      el.innerHTML = locationDotSvg;
       locationMarkerRef.current = new mapsModule.marker.AdvancedMarkerElement({
         position: { lat: location.lat, lng: location.lng },
         map,

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS, DISTANCE_BANDS, type DistanceBandKey } from "@/lib/constants";
 import { Pagination } from "@/components/ui/pagination";
+import { MapPinIcon, InfoIcon } from "@/components/icons";
 
 type RestaurantListProps = {
   totalCount: number;
@@ -123,13 +123,7 @@ export function RestaurantList({
                       title="在地圖上查看"
                       className="min-h-11 min-w-11 px-2"
                     >
-                      <Image
-                        src="/icons/map-pin.svg"
-                        alt="地圖標記"
-                        width={20}
-                        height={20}
-                        className="text-gray-600"
-                      />
+                      <MapPinIcon className="w-5 h-5" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -138,13 +132,7 @@ export function RestaurantList({
                       title="選擇此餐廳"
                       className="min-h-11 min-w-11 px-2"
                     >
-                      <Image
-                        src="/icons/info.svg"
-                        alt="詳細資訊"
-                        width={20}
-                        height={20}
-                        className="text-gray-600"
-                      />
+                      <InfoIcon className="w-5 h-5" />
                     </Button>
                   </div>
                 </div>

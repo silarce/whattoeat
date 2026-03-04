@@ -90,6 +90,11 @@ export function useWheel() {
     return selected;
   }, []);
 
+  /** 清除選中狀態（保留轉盤項目，只雜置 winner / selectedIndex） */
+  const clearSelection = useCallback(() => {
+    setState((prev) => ({ ...prev, selectedIndex: -1, winner: null }));
+  }, []);
+
   /** 執行轉盤旋轉動畫 */
   const spin = useCallback(() => {
     const items = itemsRef.current;
@@ -155,6 +160,7 @@ export function useWheel() {
     addItem,
     pickDirect,
     autoSelect,
+    clearSelection,
     spin,
   };
 }

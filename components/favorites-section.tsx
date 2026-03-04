@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import type { FavoriteRestaurant } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS } from "@/lib/constants";
-import Image from "next/image";
+import { InfoIcon } from "@/components/icons";
 
 type FavoritesSectionProps = {
   favorites: FavoriteRestaurant[];
@@ -94,13 +94,7 @@ export function FavoritesSection({
                       title="詳細資訊"
                       className="min-h-11 min-w-11 px-2"
                     >
-                      <Image
-                        src="/icons/info.svg"
-                        alt="詳細資訊"
-                        width={20}
-                        height={20}
-                        className="text-gray-600"
-                      />
+                      <InfoIcon className="w-5 h-5" />
                     </Button>
                     <Button
                       variant="danger"
