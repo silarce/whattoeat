@@ -1,4 +1,5 @@
 "use client";
+import { XIcon } from "@/components/icons";
 
 import { useEffect, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -59,10 +60,7 @@ export function Drawer({ isOpen, onClose, children }: DrawerProps) {
             className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors dark:text-gray-400 dark:hover:bg-gray-800"
             aria-label="關閉面板"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
+            <XIcon className="h-5 w-5" />
           </button>
         </div>
 

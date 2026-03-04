@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { XCircleIcon } from "@/components/icons";
 
 type CardProps = HTMLAttributes<HTMLDivElement>;
 
@@ -32,9 +33,7 @@ function Card({ name, isSelected, disabled, onClick, onRemove }: WheelCardProps)
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           className="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition-colors cursor-pointer dark:text-gray-500 dark:hover:text-red-400"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
+          <XCircleIcon className="w-5 h-5" />
         </span>
       )}
       <p
