@@ -11,6 +11,7 @@ type WheelSectionProps = {
   onSpin: () => void;
   onRandomize: () => void;
   onClear: () => void;
+  onRemoveItem: (id: string) => void;
   onSelect?: (restaurant: Restaurant) => void;
 };
 
@@ -21,6 +22,7 @@ export function WheelSection({
   onSpin,
   onRandomize,
   onClear,
+  onRemoveItem,
   onSelect,
 }: WheelSectionProps) {
   return (
@@ -64,6 +66,7 @@ export function WheelSection({
                 key={item.id}
                 name={item.name}
                 isSelected={index === selectedIndex}
+                onRemove={() => onRemoveItem(item.id)}
                 onClick={() => onSelect?.(item)}
               />
             ))}

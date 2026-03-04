@@ -77,6 +77,7 @@ export function RestaurantList({
             {pagedRestaurants.map((restaurant) => {
               const checked = manualWheelIds.includes(restaurant.id);
               const isFav = favoriteIds.includes(restaurant.id);
+              const wheelFull = manualWheelIds.length >= MAX_WHEEL_ITEMS;
               return (
                 <div
                   key={restaurant.id}
@@ -91,7 +92,8 @@ export function RestaurantList({
                     type="checkbox"
                     checked={checked}
                     onChange={() => onToggleWheel(restaurant.id)}
-                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                    disabled={wheelFull && !checked}
+                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label={`加入轉盤：${restaurant.name}`}
                   />
 

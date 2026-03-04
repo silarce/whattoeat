@@ -55,6 +55,7 @@ export function FavoritesSection({
           <div ref={scrollRef} className="flex-1 overflow-auto space-y-2 pb-2">
             {pagedFavorites.map((item) => {
               const checked = manualWheelIds.includes(item.id);
+              const wheelFull = manualWheelIds.length >= MAX_WHEEL_ITEMS;
               return (
                 <div
                   key={item.id}
@@ -69,7 +70,8 @@ export function FavoritesSection({
                     type="checkbox"
                     checked={checked}
                     onChange={() => onToggleWheel(item.id)}
-                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                    disabled={wheelFull && !checked}
+                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label={`加入轉盤：${item.name}`}
                   />
 

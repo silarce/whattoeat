@@ -219,6 +219,7 @@ export default function Home() {
               onSpin={handleSpin}
               onRandomize={handleRandomize}
               onClear={handleClearWheel}
+              onRemoveItem={handleToggleWheel}
               onSelect={handleSelectRestaurant}
             />
 
