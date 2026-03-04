@@ -46,7 +46,23 @@ export function useWheel() {
   const setItems = useCallback((items: Restaurant[]) => {
     const next = items.slice(0, MAX_WHEEL_ITEMS);
     itemsRef.current = next;
-    setState((prev) => ({ ...prev, items: next }));
+    setState((prev) => {
+      // 找出目前被選中的餐廳 ID
+      const selectedId = prev.selectedIndex >= 0
+        ? prev.items[prev.selectedIndex]?.id
+        : undefined;
+      // 在新陣列中尋找同一間餐廳
+      const newSelectedIndex = selectedId !== undefined
+        ? next.findIndex((r) => r.id === selectedId)
+        : -1;
+      return {
+        ...prev,
+        items: next,
+        selectedIndex: newSelectedIndex,
+        // 若選中餐廳已被移除，同步清除 winner
+        winner: newSelectedIndex >= 0 ? prev.winner : null,
+      };
+    });
   }, []);
 
   /** 加入單一項目到轉盤 */
