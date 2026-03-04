@@ -48,7 +48,7 @@ export function WheelSection({
             <p className="text-sm text-gray-500">搜尋餐廳後，會自動填入轉盤</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
+          <div className="h-32 grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
             {items.map((item, index) => (
               <Card
                 key={item.id}
