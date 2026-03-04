@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import type { FavoriteRestaurant } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS } from "@/lib/constants";
+import Image from "next/image";
 
 type FavoritesSectionProps = {
   favorites: FavoriteRestaurant[];
@@ -16,7 +17,7 @@ type FavoritesSectionProps = {
   onPageChange: (page: number) => void;
   manualWheelIds: string[];
   onToggleWheel: (id: string) => void;
-  onViewOnMap: (fav: FavoriteRestaurant) => void;
+  onSelect: (fav: FavoriteRestaurant) => void;
   onRemove: (id: string) => void;
 };
 
@@ -28,7 +29,7 @@ export function FavoritesSection({
   onPageChange,
   manualWheelIds,
   onToggleWheel,
-  onViewOnMap,
+  onSelect,
   onRemove,
 }: FavoritesSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -87,11 +88,17 @@ export function FavoritesSection({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onViewOnMap(item)}
-                      title="在地圖上查看"
+                      onClick={() => onSelect(item)}
+                      title="詳細資訊"
                       className="min-h-11 min-w-11 px-2"
                     >
-                      🗺️
+                      <Image
+                        src="/icons/info.svg"
+                        alt="詳細資訊"
+                        width={20}
+                        height={20}
+                        className="text-gray-600"
+                      />
                     </Button>
                     <Button
                       variant="danger"

@@ -33,6 +33,7 @@ type SidePanelProps = {
   favTotalPages: number;
   onFavPageChange: (page: number) => void;
   onToggleFavWheel: (id: string) => void;
+  onSelectFav: (fav: FavoriteRestaurant) => void;
   onRemoveFavorite: (id: string) => void;
 };
 
@@ -57,6 +58,7 @@ export function SidePanel({
   favTotalPages,
   onFavPageChange,
   onToggleFavWheel,
+  onSelectFav,
   onRemoveFavorite,
 }: SidePanelProps) {
   return (
@@ -111,7 +113,7 @@ export function SidePanel({
             onPageChange={onFavPageChange}
             manualWheelIds={manualWheelIds}
             onToggleWheel={onToggleFavWheel}
-            onViewOnMap={onViewOnMap}
+            onSelect={onSelectFav}
             onRemove={onRemoveFavorite}
           />
         </TabsContent>

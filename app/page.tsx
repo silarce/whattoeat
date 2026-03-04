@@ -247,6 +247,7 @@ export default function Home() {
                 favTotalPages={favs.totalPages}
                 onFavPageChange={favs.setPage}
                 onToggleFavWheel={handleToggleWheel}
+                onSelectFav={(fav) => handleSelectRestaurant(fav as Restaurant)}
                 onRemoveFavorite={favs.remove}
               />
             </div>
@@ -277,6 +278,7 @@ export default function Home() {
               favTotalPages={favs.totalPages}
               onFavPageChange={favs.setPage}
               onToggleFavWheel={handleToggleWheel}
+              onSelectFav={(fav) => { handleSelectRestaurant(fav as Restaurant); setDrawerOpen(false); }}
               onRemoveFavorite={favs.remove}
             />
           </Drawer>
