@@ -8,19 +8,33 @@ type RestaurantMapProps = {
   apiKey: string;
   location: { lat: number; lng: number };
   restaurants: Restaurant[];
+  extraRestaurant?: Restaurant | null;
   selectedRestaurant: Restaurant | null;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
-// zoom 閾值：超過此值就隱藏自訂 label（預留給 Google 原生 POI 標籤）
+// zoom 閾値：超過此値就隱藏自訂 label（預留給 Google 原生 POI 標籤）
 const LABEL_HIDE_ZOOM = 20;
 // 點擊 marker / 選取餐廳時，地圖縮放到的目標 zoom（街道等級）
 const RESTAURANT_FOCUS_ZOOM = 17;
+const MARKER_DEFAULT_COLOR = "#e18646";
+const MARKER_WINNER_COLOR  = "#ef4444";
 
+function makePinHtml(color: string) {
+  return `<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="${color}" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>`;
+}
+
+function applyColorToEl(el: HTMLElement, color: string) {
+  const labelDiv = el.firstElementChild as HTMLElement | null;
+  if (labelDiv) labelDiv.style.color = color;
+  const pinDiv = el.lastElementChild as HTMLElement | null;
+  if (pinDiv) pinDiv.innerHTML = makePinHtml(color);
+}
 export default function RestaurantMap({
   apiKey,
   location,
   restaurants,
+  extraRestaurant,
   selectedRestaurant,
   onSelectRestaurant,
 }: RestaurantMapProps) {
@@ -32,6 +46,10 @@ export default function RestaurantMap({
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const labelsRef = useRef<HTMLElement[]>([]);
   const zoomListenerRef = useRef<google.maps.MapsEventListener | null>(null);
+  const selectedMarkerElRef = useRef<HTMLElement | null>(null);
+  // ref 鏡像，讓 updateMarkers 不需依賴 selectedRestaurant 就能讀到最新值
+  const selectedRestaurantRef = useRef(selectedRestaurant);
+  selectedRestaurantRef.current = selectedRestaurant;
 
   // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
   const [mapReady, setMapReady] = useState(false);
@@ -160,6 +178,7 @@ export default function RestaurantMap({
     markersRef.current.forEach((m) => { m.map = null; });
     markersRef.current = [];
     labelsRef.current = [];
+    selectedMarkerElRef.current = null;
 
     // 移除舊的 zoom 監聽器
     if (zoomListenerRef.current) {
@@ -169,9 +188,14 @@ export default function RestaurantMap({
 
     if (!mapsModule.marker?.AdvancedMarkerElement) return;
 
+    // 若 extraRestaurant 不在目前清單中，額外加入以確保地圖上有其 marker
+    const effectiveList =
+      extraRestaurant && !restaurants.some((r) => r.id === extraRestaurant.id)
+        ? [...restaurants, extraRestaurant]
+        : restaurants;
 
 
-    restaurants.forEach((restaurant) => {
+    effectiveList.forEach((restaurant) => {
       if (!restaurant.lat || !restaurant.lng) return;
 
       // 外層容器：label 在上、pin SVG 在下
@@ -191,7 +215,6 @@ export default function RestaurantMap({
         "background:transparent",
         "font-size:13px",
         "font-weight:600",
-        "color:#e18646",
         "white-space:nowrap",
         "overflow:hidden",
         "text-overflow:ellipsis",
@@ -203,8 +226,10 @@ export default function RestaurantMap({
 
       // pin SVG
       const pinEl = document.createElement("div");
-      pinEl.innerHTML =
-        '<svg width="32" height="44" viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C9.37 2 4 7.37 4 14c0 7 12 28 12 28s12-21 12-28c0-6.63-5.37-12-12-12z" fill="#e18646" stroke="white" stroke-width="1.5"/><circle cx="16" cy="13" r="4" fill="white"/></svg>';
+      const isWinner = selectedRestaurantRef.current?.id === restaurant.id;
+      const pinColor = isWinner ? MARKER_WINNER_COLOR : MARKER_DEFAULT_COLOR;
+      label.style.color = pinColor;
+      pinEl.innerHTML = makePinHtml(pinColor);
 
       el.appendChild(label);
       el.appendChild(pinEl);
@@ -225,9 +250,11 @@ export default function RestaurantMap({
       });
 
       markersRef.current.push(marker);
+
+      if (isWinner) selectedMarkerElRef.current = el;
     });
 
-    if (restaurants.length > 0) {
+    if (effectiveList.length > 0) {
       const bounds = new mapsModule.LatLngBounds();
       bounds.extend({ lat: location.lat, lng: location.lng });
       markersRef.current.forEach((marker) => {
@@ -235,6 +262,13 @@ export default function RestaurantMap({
         if (pos) bounds.extend(pos);
       });
       map.fitBounds(bounds, 50);
+    }
+
+    // 若此時已有 winner，fitBounds 之後立即置中回 winner
+    const winner = selectedRestaurantRef.current;
+    if (winner?.lat && winner?.lng) {
+      map.panTo({ lat: winner.lat, lng: winner.lng });
+      map.setZoom(RESTAURANT_FOCUS_ZOOM);
     }
 
     // 根據 zoom 同步 label 可見性
@@ -247,7 +281,7 @@ export default function RestaurantMap({
     };
     syncLabels();
     zoomListenerRef.current = mapsModule.event.addListener(map, "zoom_changed", syncLabels);
-  }, [restaurants, location.lat, location.lng]);
+  }, [restaurants, extraRestaurant, location.lat, location.lng]);
 
   // 4) 地圖就緒 + restaurants 改變 → 更新 markers
   useEffect(() => {
@@ -264,30 +298,36 @@ export default function RestaurantMap({
     };
   }, [mapReady, restaurants, updateMarkers]);
 
-  // 5) selectedRestaurant 改變 → focus 並開啟 InfoWindow
+  // 5) selectedRestaurant 改變 → focus、開啟 InfoWindow、更新 marker 顏色
   useEffect(() => {
-    if (!mapReady || !selectedRestaurant) return;
+    if (!mapReady) return;
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (selectedRestaurant.lat && selectedRestaurant.lng) {
-      map.panTo({ lat: selectedRestaurant.lat, lng: selectedRestaurant.lng });
-      map.setZoom(RESTAURANT_FOCUS_ZOOM);
+    // 還原舊的 winner marker
+    if (selectedMarkerElRef.current) {
+      applyColorToEl(selectedMarkerElRef.current, MARKER_DEFAULT_COLOR);
+      selectedMarkerElRef.current = null;
+    }
 
-      // 找出對應的 marker 並開啟 InfoWindow
-      const marker = markersRef.current.find(
-        (m) => m.title === selectedRestaurant.name,
-      );
-      if (marker) {
-        openInfoWindowRef.current(marker, selectedRestaurant);
-      }
+    if (!selectedRestaurant?.lat || !selectedRestaurant?.lng) return;
+
+    map.panTo({ lat: selectedRestaurant.lat, lng: selectedRestaurant.lng });
+    map.setZoom(RESTAURANT_FOCUS_ZOOM);
+
+    const marker = markersRef.current.find((m) => m.title === selectedRestaurant.name);
+    if (marker) {
+      openInfoWindowRef.current(marker, selectedRestaurant);
+      const el = marker.content as HTMLElement;
+      applyColorToEl(el, MARKER_WINNER_COLOR);
+      selectedMarkerElRef.current = el;
     }
   }, [mapReady, selectedRestaurant]);
 
   return (
     <div
       ref={mapRef}
-      className="h-64 w-full rounded-xl sm:h-80 md:h-96 lg:h-[28rem]"
+      className="h-64 w-full rounded-xl sm:h-80 md:h-96 lg:h-112"
       style={{ minHeight: "256px" }}
     />
   );

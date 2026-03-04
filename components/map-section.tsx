@@ -9,6 +9,7 @@ type MapSectionProps = {
   apiKey: string | undefined;
   location: LatLng | null;
   restaurants: Restaurant[];
+  extraRestaurant?: Restaurant | null;
   mapTarget: Restaurant | null;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
@@ -17,6 +18,7 @@ export function MapSection({
   apiKey,
   location,
   restaurants,
+  extraRestaurant,
   mapTarget,
   onSelectRestaurant,
 }: MapSectionProps) {
@@ -33,6 +35,7 @@ export function MapSection({
             apiKey={apiKey}
             location={location}
             restaurants={restaurants}
+            extraRestaurant={extraRestaurant}
             selectedRestaurant={mapTarget}
             onSelectRestaurant={onSelectRestaurant}
           />

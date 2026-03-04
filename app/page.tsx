@@ -30,6 +30,7 @@ export default function Home() {
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
+  const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -152,6 +153,12 @@ export default function Home() {
     (restaurant: Restaurant) => {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
+      // 若餐廳不在目前搜尋清單中，將其記為額外地圖標記點
+      if (!searchHook.restaurants.some((r) => r.id === restaurant.id)) {
+        setExtraMapRestaurant(restaurant);
+      } else {
+        setExtraMapRestaurant(null);
+      }
       showModal(
         <WinnerCard
           winner={restaurant}
@@ -161,7 +168,7 @@ export default function Home() {
         />,
       );
     },
-    [wheel, favs],
+    [wheel, favs, searchHook.restaurants],
   );
 
   const handleViewOnMap = useCallback((restaurant: Restaurant | FavoriteRestaurant) => {
@@ -219,6 +226,7 @@ export default function Home() {
               apiKey={googleMapsApiKey}
               location={geo.location}
               restaurants={searchHook.restaurants}
+              extraRestaurant={extraMapRestaurant}
               mapTarget={mapTarget}
               onSelectRestaurant={handleSelectRestaurant}
             />
