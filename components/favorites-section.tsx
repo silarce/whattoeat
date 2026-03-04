@@ -6,6 +6,7 @@ import { CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import type { FavoriteRestaurant } from "@/types/restaurant";
+import { MAX_WHEEL_ITEMS } from "@/lib/constants";
 
 type FavoritesSectionProps = {
   favorites: FavoriteRestaurant[];
@@ -13,7 +14,8 @@ type FavoritesSectionProps = {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  onAddToWheel: (fav: FavoriteRestaurant) => void;
+  manualWheelIds: string[];
+  onToggleWheel: (id: string) => void;
   onViewOnMap: (fav: FavoriteRestaurant) => void;
   onRemove: (id: string) => void;
 };
@@ -24,7 +26,8 @@ export function FavoritesSection({
   page,
   totalPages,
   onPageChange,
-  onAddToWheel,
+  manualWheelIds,
+  onToggleWheel,
   onViewOnMap,
   onRemove,
 }: FavoritesSectionProps) {
@@ -43,57 +46,66 @@ export function FavoritesSection({
         </div>
       ) : (
         <>
+          {favorites.length > 0 && (
+            <p className="mb-2 text-xs text-gray-500">
+              勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
+            </p>
+          )}
           <div ref={scrollRef} className="flex-1 overflow-auto space-y-2 pb-2">
-            {pagedFavorites.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
-                  "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
-                )}
-              >
-                <span className="text-base leading-none" aria-label="已收藏">
-                  ❤️
-                </span>
-
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
-                  {item.address && (
-                    <p className="mt-0.5 truncate text-xs text-gray-500">{item.address}</p>
+            {pagedFavorites.map((item) => {
+              const checked = manualWheelIds.includes(item.id);
+              return (
+                <div
+                  key={item.id}
+                  className={cn(
+                    "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
+                    checked
+                      ? "border-orange-200 bg-orange-50"
+                      : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
                   )}
-                </div>
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => onToggleWheel(item.id)}
+                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                    aria-label={`加入轉盤：${item.name}`}
+                  />
 
-                <div className="flex shrink-0 items-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onAddToWheel(item)}
-                    title="加入轉盤"
-                    className="min-h-11 min-w-11 px-2"
-                  >
-                    🎰
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onViewOnMap(item)}
-                    title="在地圖上查看"
-                    className="min-h-11 min-w-11 px-2"
-                  >
-                    🗺️
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => onRemove(item.id)}
-                    title="移除收藏"
-                    className="min-h-11 min-w-11 px-2"
-                  >
-                    🗑️
-                  </Button>
+                  <span className="text-base leading-none" aria-label="已收藏">
+                    ❤️
+                  </span>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
+                    {item.address && (
+                      <p className="mt-0.5 truncate text-xs text-gray-500">{item.address}</p>
+                    )}
+                  </div>
+
+                  <div className="flex shrink-0 items-center">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewOnMap(item)}
+                      title="在地圖上查看"
+                      className="min-h-11 min-w-11 px-2"
+                    >
+                      🗺️
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => onRemove(item.id)}
+                      title="移除收藏"
+                      className="min-h-11 min-w-11 px-2"
+                    >
+                      🗑️
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
         </>

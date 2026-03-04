@@ -124,14 +124,23 @@ export default function Home() {
             ? [...prev, id]
             : prev;
 
-        const selected = searchHook.restaurants.filter((r) =>
-          nextIds.includes(r.id),
-        );
+        // 同時從餐廳列表與收藏列表查找，確保兩邊都能加入轉盤
+        const allSources: Restaurant[] = [
+          ...searchHook.restaurants,
+          ...favs.favorites,
+        ];
+        const uniqueMap = new Map<string, Restaurant>();
+        for (const r of allSources) {
+          if (!uniqueMap.has(r.id)) uniqueMap.set(r.id, r);
+        }
+        const selected = nextIds
+          .map((nid) => uniqueMap.get(nid))
+          .filter((r): r is Restaurant => !!r);
         wheel.setItems(selected);
         return nextIds;
       });
     },
-    [searchHook.restaurants, wheel],
+    [searchHook.restaurants, favs.favorites, wheel],
   );
 
   const handleSelectRestaurant = useCallback(
@@ -231,7 +240,7 @@ export default function Home() {
                 favPage={favs.page}
                 favTotalPages={favs.totalPages}
                 onFavPageChange={favs.setPage}
-                onAddToWheel={wheel.addItem}
+                onToggleFavWheel={handleToggleWheel}
                 onRemoveFavorite={favs.remove}
               />
             </div>
@@ -261,7 +270,7 @@ export default function Home() {
               favPage={favs.page}
               favTotalPages={favs.totalPages}
               onFavPageChange={favs.setPage}
-              onAddToWheel={wheel.addItem}
+              onToggleFavWheel={handleToggleWheel}
               onRemoveFavorite={favs.remove}
             />
           </Drawer>
