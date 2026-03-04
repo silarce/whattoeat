@@ -28,12 +28,12 @@ export function LoadingOverlay({ isLoading, message = "載入中…", delay = 20
     <div
       data-component="LoadingOverlay"
       className={fullscreen
-        ? "fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white/90 backdrop-blur-sm"
-        : "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/80 backdrop-blur-sm"
+        ? "fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white/90 backdrop-blur-sm dark:bg-gray-950/90"
+        : "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/80 backdrop-blur-sm dark:bg-gray-900/80"
       }
     >
       <ClipLoader color="#f97316" size={36} speedMultiplier={0.8} />
-      <p className="text-sm font-medium text-gray-600">{message}</p>
+      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{message}</p>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export default function Home() {
   const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
 
   // 掛載後自動定位
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function Home() {
 // region --- Render ---
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 overflow-x-hidden">
       <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
         isLocating={geo.isLocating}

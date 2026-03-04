@@ -42,13 +42,13 @@ export function FavoritesSection({
   return (
     <CardBody className="flex-1 min-h-0 pb-0 flex flex-col">
       {favorites.length === 0 ? (
-        <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
-          <p className="text-sm text-gray-500">選好餐廳後點「加入收藏」即可保存</p>
+        <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">選好餐廳後點「加入收藏」即可保存</p>
         </div>
       ) : (
         <>
           {favorites.length > 0 && (
-            <p className="mb-2 text-xs text-gray-500">
+            <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
               勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
             </p>
           )}
@@ -62,8 +62,8 @@ export function FavoritesSection({
                   className={cn(
                     "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
                     checked
-                      ? "border-orange-200 bg-orange-50"
-                      : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50",
+                      ? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950"
+                      : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600 dark:hover:bg-gray-750",
                   )}
                 >
                   <input
@@ -80,9 +80,9 @@ export function FavoritesSection({
                   </span>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
+                    <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">{item.name}</p>
                     {item.address && (
-                      <p className="mt-0.5 truncate text-xs text-gray-500">{item.address}</p>
+                      <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">{item.address}</p>
                     )}
                   </div>
 
