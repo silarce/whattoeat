@@ -47,16 +47,16 @@ export function Drawer({ isOpen, onClose, children }: DrawerProps) {
       {/* Drawer panel */}
       <div
         className={cn(
-          "fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-gray-50 shadow-2xl transition-transform duration-300 ease-in-out",
+          "fixed inset-y-0 right-0 z-50 w-full max-w-md transform bg-gray-50 shadow-2xl transition-transform duration-300 ease-in-out dark:bg-gray-950",
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         {/* 關閉按鈕 */}
-        <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-          <span className="text-lg font-semibold text-gray-900">📋 餐廳列表</span>
+        <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+          <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">📋 餐廳列表</span>
           <button
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors dark:text-gray-400 dark:hover:bg-gray-800"
             aria-label="關閉面板"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">

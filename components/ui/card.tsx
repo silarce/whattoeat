@@ -18,8 +18,8 @@ function Card({ name, isSelected, onClick, onRemove }: WheelCardProps) {
       className={cn(
         "relative w-full overflow-hidden rounded-xl border-2 px-3 py-3 text-center transition-all duration-150",
         isSelected
-          ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-100 scale-105"
-          : "border-gray-100 bg-gray-50 hover:border-orange-300 hover:bg-orange-50/50 cursor-pointer",
+          ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-100 dark:bg-orange-950 dark:shadow-orange-900/20"
+          : "border-gray-100 bg-gray-50 hover:border-orange-300 hover:bg-orange-50/50 cursor-pointer dark:border-gray-700 dark:bg-gray-800 dark:hover:border-orange-600 dark:hover:bg-orange-950/50",
       )}
     >
       {onRemove && (
@@ -27,7 +27,7 @@ function Card({ name, isSelected, onClick, onRemove }: WheelCardProps) {
           role="button"
           aria-label="移除"
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
-          className="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+          className="absolute top-0 right-0 text-gray-400 hover:text-red-500 transition-colors cursor-pointer dark:text-gray-500 dark:hover:text-red-400"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -37,7 +37,7 @@ function Card({ name, isSelected, onClick, onRemove }: WheelCardProps) {
       <p
         className={cn(
           "line-clamp-2 text-xs font-medium leading-tight",
-          isSelected ? "text-orange-900" : "text-gray-700",
+          isSelected ? "text-orange-900 dark:text-orange-200" : "text-gray-700 dark:text-gray-300",
         )}
       >
         {name}
@@ -52,7 +52,7 @@ const CardContainer = forwardRef<HTMLDivElement, CardProps>(
       ref={ref}
       data-component="CardContainer"
       className={cn(
-        "rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 overflow-hidden",
+        "rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 overflow-hidden dark:bg-gray-900 dark:ring-gray-100/10",
         className,
       )}
       {...props}

@@ -10,7 +10,7 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
     <TabsPrimitive.List
       data-component="TabsList"
       className={cn(
-        "flex w-full rounded-lg bg-gray-100 p-1 text-gray-500",
+        "flex w-full rounded-lg bg-gray-100 p-1 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
         className,
       )}
       {...props}
@@ -24,8 +24,8 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
       data-component="TabsTrigger"
       className={cn(
         "flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all min-h-11",
-        "hover:text-gray-900",
-        "data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm",
+        "hover:text-gray-900 dark:hover:text-gray-100",
+        "data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-gray-100",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500",
         className,
       )}

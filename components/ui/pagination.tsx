@@ -12,7 +12,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-100 pt-3 sticky bottom-0 bg-white pb-5">
+    <div className="flex items-center justify-between border-t border-gray-100 pt-3 sticky bottom-0 bg-white pb-5 dark:border-gray-800 dark:bg-gray-900">
       <Button
         variant="ghost"
         size="md"
@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       >
         ← 上一頁
       </Button>
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-gray-500 dark:text-gray-400">
         {page + 1} / {totalPages}
       </span>
       <Button

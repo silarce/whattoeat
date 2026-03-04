@@ -18,20 +18,20 @@ export function LocationPermissionModal({
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl focus:outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl focus:outline-none dark:bg-gray-900">
           <div className="space-y-4">
             {/* Title */}
             <div>
-              <Dialog.Title className="text-lg font-bold text-gray-900">
+              <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-gray-100">
                 需要定位權限
               </Dialog.Title>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 「What To Eat」需要存取您的位置，以搜尋附近餐廳。
               </p>
             </div>
 
             {/* Instructions */}
-            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-1">
+            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-700 space-y-1 dark:bg-gray-800 dark:text-gray-300">
               <p className="font-medium">如何開啟定位權限：</p>
               <p>• Chrome：網址列左側鎖頭 → 網站設定 → 位置</p>
               <p>• Safari：設定 → 隱私權與安全性 → 定位服務</p>

@@ -8,10 +8,10 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const variantStyles: Record<BadgeVariant, string> = {
-  default: "bg-gray-100 text-gray-800",
-  success: "bg-green-100 text-green-800",
-  warning: "bg-amber-100 text-amber-800",
-  info: "bg-orange-100 text-orange-800",
+  default: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+  success: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  warning: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  info: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
 };
 
 export function Badge({

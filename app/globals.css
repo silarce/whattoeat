@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -19,6 +25,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dark body,
+:where(.dark) body {
+  background: #111827;
+  color: #f3f4f6;
+}
+
 /* Smooth scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -35,4 +47,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+:where(.dark) ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+:where(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }

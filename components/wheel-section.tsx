@@ -29,23 +29,23 @@ export function WheelSection({
     <CardContainer>
       <CardHeader>
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">🎰 餐廳抽選</h2>
-          <div className="flex  gap-2 flex-row "
-          >
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">🎰 餐廳抽選</h2>
+          <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto">
             <Button
               variant="primary"
-              size="lg"
+              size="md"
               onClick={onSpin}
               disabled={isSpinning || items.length === 0}
+              className="col-span-2 sm:col-auto"
             >
               {isSpinning ? "旋轉中…" : "🎲 開始抽選"}
             </Button>
-            <Button variant="secondary" size="lg" onClick={onRandomize}>
+            <Button variant="secondary" size="md" onClick={onRandomize}>
               🔀 抽十個
             </Button>
             <Button
               variant="ghost"
-              size="lg"
+              size="md"
               onClick={onClear}
               disabled={items.length === 0}
             >
@@ -56,11 +56,11 @@ export function WheelSection({
       </CardHeader>
       <CardBody>
         {items.length === 0 ? (
-          <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200">
-            <p className="text-sm text-gray-500">搜尋餐廳後，會自動填入轉盤</p>
+          <div className="flex h-[332px] sm:h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">搜尋餐廳後，會自動填入轉盤</p>
           </div>
         ) : (
-          <div className="h-32 grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5">
+          <div className="h-[332px] sm:h-32 grid grid-cols-2 gap-2 auto-rows-[60px] sm:grid-cols-5 overflow-hidden">
             {items.map((item, index) => (
               <Card
                 key={item.id}

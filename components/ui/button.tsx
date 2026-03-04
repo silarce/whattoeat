@@ -11,13 +11,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-orange-500",
+    "bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-orange-500 dark:bg-orange-600 dark:hover:bg-orange-500 dark:active:bg-orange-700",
   secondary:
-    "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus-visible:ring-gray-400",
+    "bg-white text-gray-900 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus-visible:ring-gray-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:hover:bg-gray-700 dark:active:bg-gray-600",
   ghost:
-    "bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400",
+    "bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
   danger:
-    "bg-white text-red-600 border border-red-200 hover:bg-red-50 active:bg-red-100 focus-visible:ring-red-500",
+    "bg-white text-red-600 border border-red-200 hover:bg-red-50 active:bg-red-100 focus-visible:ring-red-500 dark:bg-gray-800 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950 dark:active:bg-red-900",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

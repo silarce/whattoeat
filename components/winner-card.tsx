@@ -20,13 +20,13 @@ function StarRating({ rating }: { rating: number }) {
           const filled = rating >= star;
           const half = !filled && rating >= star - 0.5;
           return (
-            <span key={star} className={half || filled ? "text-amber-400" : "text-gray-200"}>
+            <span key={star} className={half || filled ? "text-amber-400" : "text-gray-200 dark:text-gray-600"}>
               {half ? "⭐" : "★"}
             </span>
           );
         })}
       </div>
-      <span className="text-sm font-semibold text-gray-700">{rating.toFixed(1)}</span>
+      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{rating.toFixed(1)}</span>
     </div>
   );
 }
@@ -57,7 +57,7 @@ export function WinnerCard({
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+    <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden dark:bg-gray-900">
       {/* 頂部橫幅 */}
       <div className="bg-linear-to-r from-orange-500 to-orange-400 px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center justify-between">
@@ -81,19 +81,19 @@ export function WinnerCard({
         {winner.openNow !== undefined && (
           <div className="flex items-center gap-2">
             <span className={`h-2 w-2 rounded-full shrink-0 ${winner.openNow ? "bg-green-500" : "bg-red-400"}`} />
-            <span className={`text-sm font-medium ${winner.openNow ? "text-green-700" : "text-red-600"}`}>
+            <span className={`text-sm font-medium ${winner.openNow ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
               {winner.openNow ? "營業中" : "已打烊"}
             </span>
           </div>
         )}
         {winner.address && (
-          <div className="flex items-start gap-2 text-sm text-gray-600">
+          <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span className="shrink-0 mt-0.5">地址 : </span>
             <span>{winner.address}</span>
           </div>
         )}
         {winner.phone && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <span className="shrink-0">電話 : </span>
             <a href={`tel:${winner.phone}`} className="hover:text-orange-500 transition-colors">
               {winner.phone}
