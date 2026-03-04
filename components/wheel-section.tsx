@@ -66,6 +66,7 @@ export function WheelSection({
                 key={item.id}
                 name={item.name}
                 isSelected={index === selectedIndex}
+                disabled={isSpinning}
                 onRemove={() => onRemoveItem(item.id)}
                 onClick={() => onSelect?.(item)}
               />

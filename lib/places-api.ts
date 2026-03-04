@@ -75,61 +75,63 @@ function parsePlaces(
 }
 
 // ---------------------------------------------------------------------------
-//  Internal helpers - API 搜尋
+//  Internal helpers - API 搜尋 (Nearby Search)
 // ---------------------------------------------------------------------------
 
-const SEARCH_QUERIES = ["餐廳", "飯", "麵"];
+/**
+ * 分批搜尋的 type 組合 — 每次 API 呼叫最多回傳 20 筆，
+ * 用多組 type 並行搜尋再去重，可取得更多候選。
+ */
+const SEARCH_TYPE_GROUPS: string[][] = [
+  // 每組獨立呼叫 API，各取最多 20 筆，並行後合併去重
+  // 同組內多個 type 為 OR 關係（符合任一即回傳）
+  ["restaurant"],
+  ["meal_takeaway", "meal_delivery"],
+  ["cafe", "bakery"],
+  ["taiwanese_restaurant", "dim_sum_restaurant"],
+  ["japanese_restaurant", "korean_restaurant"],
+  ["breakfast_restaurant", "brunch_restaurant"],
+];
 
 /**
- * 用單一關鍵字搜尋，支援多頁分頁
+ * 用 Nearby Search (New) 以 place type 搜尋，
+ * locationRestriction 嚴格限制半徑、rankPreference=DISTANCE 確保穩定排序。
  */
-async function searchByQuery(
-  query: string,
+async function searchByTypes(
+  types: string[],
   lat: number,
   lng: number,
   apiKey: string,
-  maxPages: number,
 ): Promise<Restaurant[]> {
-  const results: Restaurant[] = [];
-  let pageToken: string | undefined;
-
-  for (let page = 0; page < maxPages; page++) {
-    const body: Record<string, unknown> = {
-      textQuery: query,
-      maxResultCount: 20,
-      locationBias: {
-        circle: {
-          center: { latitude: lat, longitude: lng },
-          radius: 5000,
-        },
+  const body = {
+    includedTypes: types,
+    maxResultCount: 20,
+    rankPreference: "DISTANCE" as const,
+    locationRestriction: {
+      circle: {
+        center: { latitude: lat, longitude: lng },
+        radius: API_SEARCH_RADIUS,
       },
-    };
+    },
+  };
 
-    if (pageToken) body.pageToken = pageToken;
+  const response = await fetch(PLACES_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": PLACES_FIELD_MASK,
+    },
+    body: JSON.stringify(body),
+  });
 
-    const response = await fetch(PLACES_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": PLACES_FIELD_MASK,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      console.warn(`Failed to search "${query}": ${response.status}`);
-      break;
-    }
-
-    const data = (await response.json()) as PlaceResponse;
-    results.push(...parsePlaces(data.places ?? [], apiKey));
-
-    if (!data.nextPageToken) break;
-    pageToken = data.nextPageToken;
+  if (!response.ok) {
+    console.warn(`Failed to searchNearby [${types.join(", ")}]: ${response.status}`);
+    return [];
   }
 
-  return results;
+  const data = (await response.json()) as PlaceResponse;
+  return parsePlaces(data.places ?? [], apiKey);
 }
 
 // ---------------------------------------------------------------------------
@@ -137,23 +139,23 @@ async function searchByQuery(
 // ---------------------------------------------------------------------------
 
 /**
- * 用多個關鍵字並行搜尋所有餐廳（每個關鍵字最多 5 頁），合併去重結果。
- * 搜尋結果會以 Haversine 過濾掉超出 API_SEARCH_RADIUS（1200m）的項目。
+ * 用多組 place type 並行搜尋所有餐廳，合併去重結果。
+ * Nearby Search 已用 locationRestriction 嚴格限制半徑，
+ * 這裡再用 Haversine 做最終確認過濾。
  */
 export async function searchAllNearby(
   lat: number,
   lng: number,
   apiKey: string,
 ): Promise<Restaurant[]> {
-  // 並行搜尋所有關鍵字，加快速度
-  const searchPromises = SEARCH_QUERIES.map((query) =>
-    searchByQuery(query, lat, lng, apiKey, 5)
+  const searchPromises = SEARCH_TYPE_GROUPS.map((types) =>
+    searchByTypes(types, lat, lng, apiKey),
   );
 
   const resultsArray = await Promise.all(searchPromises);
   const allRestaurants = resultsArray.flat();
 
-  // 去重 + 過濾到最大距離帶以內
+  // 去重 + Haversine 雙重確認
   const uniqueMap = new Map(allRestaurants.map((r) => [r.id, r]));
   return Array.from(uniqueMap.values()).filter((r) => {
     if (r.lat == null || r.lng == null) return false;
@@ -205,11 +207,16 @@ export function createMockRestaurants(
   lng: number,
   count = 12,
 ): Restaurant[] {
-  return Array.from({ length: count }).map((_, index) => ({
-    id: `mock-${index + 1}`,
-    name: `附近餐廳 ${index + 1}`,
-    address: `模擬地址 ${index + 1}`,
-    lat: lat + (Math.random() - 0.5) * 0.01,
-    lng: lng + (Math.random() - 0.5) * 0.01,
-  }));
+  // 使用確定性偏移（基於 index），確保每次產生相同的座標與距離
+  return Array.from({ length: count }).map((_, index) => {
+    const angle = (index / count) * 2 * Math.PI;
+    const radiusDeg = 0.0004 * ((index % 2) + 1); // 約 45m / 90m（近）與 180m / 360m（遠），都在 400m 內
+    return {
+      id: `mock-${index + 1}`,
+      name: `附近餐廳 ${index + 1}`,
+      address: `模擬地址 ${index + 1}`,
+      lat: lat + radiusDeg * Math.cos(angle),
+      lng: lng + radiusDeg * Math.sin(angle),
+    };
+  });
 }

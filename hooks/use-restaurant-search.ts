@@ -9,7 +9,7 @@ import { DISTANCE_BANDS } from "@/lib/constants";
 const PAGE_SIZE = 10;
 
 type SearchState = {
-  /** API 回傳的完整列表（1200m 內） */
+  /** API 回傳的完整列表（最大距離帶內） */
   allRestaurants: Restaurant[];
   /** 目前距離帶過濾後的列表 */
   restaurants: Restaurant[];
@@ -28,7 +28,7 @@ export function useRestaurantSearch() {
     error: null,
   });
 
-  /** 一次搜尋所有候選（最大距離帶 1200m 內），回傳完整列表 */
+  /** 一次搜尋所有候選（最大距離帶內），回傳完整列表 */
   const search = useCallback(async (location: LatLng) => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
