@@ -11,6 +11,7 @@ type RestaurantMapProps = {
   restaurants: Restaurant[];
   extraRestaurant?: Restaurant | null;
   selectedRestaurant: Restaurant | null;
+  isDark?: boolean;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
@@ -35,6 +36,7 @@ export default function RestaurantMap({
   restaurants,
   extraRestaurant,
   selectedRestaurant,
+  isDark = false,
   onSelectRestaurant,
 }: RestaurantMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,10 @@ export default function RestaurantMap({
 
   // 用 state 標記地圖是否就緒，讓後續 effect 能正確依賴
   const [mapReady, setMapReady] = useState(false);
+
+  // isDark ref 鏡像，讓初始化的 async 閉包能讀到最新值
+  const isDarkRef = useRef(isDark);
+  isDarkRef.current = isDark;
 
   const onSelectRef = useRef(onSelectRestaurant);
   onSelectRef.current = onSelectRestaurant;
@@ -124,6 +130,7 @@ export default function RestaurantMap({
           fullscreenControl: false,
           streetViewControl: false,
           mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
+          colorScheme: isDarkRef.current ? "DARK" : "LIGHT",
         });
 
         mapInstanceRef.current = map;
@@ -139,7 +146,9 @@ export default function RestaurantMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
 
-  // 2) location 改變 or 地圖就緒 → 更新位置 marker
+  // 2) isDark 變化時元件會被 key 強制 remount，此 effect 保留備用
+
+  // 3) location 改變 or 地圖就緒 → 更新位置 marker
   useEffect(() => {
     if (!mapReady) return;
     const map = mapInstanceRef.current;

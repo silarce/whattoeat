@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
@@ -26,6 +27,8 @@ export default function Home() {
   const searchHook = useRestaurantSearch();
   const wheel = useWheel();
   const favs = useFavorites();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
@@ -233,6 +236,7 @@ export default function Home() {
               restaurants={searchHook.restaurants}
               extraRestaurant={extraMapRestaurant}
               mapTarget={mapTarget}
+              isDark={isDark}
               onSelectRestaurant={handleSelectRestaurant}
             />
           </div>

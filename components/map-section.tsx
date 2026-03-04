@@ -11,6 +11,7 @@ type MapSectionProps = {
   restaurants: Restaurant[];
   extraRestaurant?: Restaurant | null;
   mapTarget: Restaurant | null;
+  isDark?: boolean;
   onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
@@ -20,6 +21,7 @@ export function MapSection({
   restaurants,
   extraRestaurant,
   mapTarget,
+  isDark = false,
   onSelectRestaurant,
 }: MapSectionProps) {
   const openMapUrl =
@@ -32,11 +34,13 @@ export function MapSection({
       <CardBody>
         {apiKey && location ? (
           <RestaurantMap
+            key={isDark ? "dark" : "light"}
             apiKey={apiKey}
             location={location}
             restaurants={restaurants}
             extraRestaurant={extraRestaurant}
             selectedRestaurant={mapTarget}
+            isDark={isDark}
             onSelectRestaurant={onSelectRestaurant}
           />
         ) : (
