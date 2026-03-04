@@ -8,6 +8,7 @@ const Tabs = TabsPrimitive.Root;
 function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
+      data-component="TabsList"
       className={cn(
         "flex w-full rounded-lg bg-gray-100 p-1 text-gray-500",
         className,
@@ -20,6 +21,7 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
 function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
+      data-component="TabsTrigger"
       className={cn(
         "flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all min-h-11",
         "hover:text-gray-900",
@@ -35,6 +37,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
 function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
   return (
     <TabsPrimitive.Content
+      data-component="TabsContent"
       className={cn("focus-visible:outline-none", className)}
       {...props}
     />

@@ -25,10 +25,13 @@ export function LoadingOverlay({ isLoading, message = "載入中…", delay = 20
   if (!visible) return null;
 
   return (
-    <div className={fullscreen
-      ? "fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white/90 backdrop-blur-sm"
-      : "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/80 backdrop-blur-sm"
-    }>
+    <div
+      data-component="LoadingOverlay"
+      className={fullscreen
+        ? "fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white/90 backdrop-blur-sm"
+        : "absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-white/80 backdrop-blur-sm"
+      }
+    >
       <ClipLoader color="#f97316" size={36} speedMultiplier={0.8} />
       <p className="text-sm font-medium text-gray-600">{message}</p>
     </div>

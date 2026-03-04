@@ -37,6 +37,7 @@ const CardContainer = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
+      data-component="CardContainer"
       className={cn(
         "rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5 overflow-hidden",
         className,
@@ -45,12 +46,13 @@ const CardContainer = forwardRef<HTMLDivElement, CardProps>(
     />
   ),
 );
-CardContainer.displayName = "Card";
+CardContainer.displayName = "CardContainer";
 
 const CardHeader = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
+      data-component="CardHeader"
       className={cn("px-5 pt-5 pb-0 sm:px-6 sm:pt-6", className)}
       {...props}
     />
@@ -62,6 +64,7 @@ const CardBody = forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
+      data-component="CardBody"
       className={cn("px-5 py-4 sm:px-6 min-w-0", className)}
       {...props}
     />
