@@ -1,20 +1,18 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, } from "react";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
-
-  const isMountedRef = useRef(false);
-  const isMounted = isMountedRef.current;
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    isMountedRef.current = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
   }, []);
 
-  // eslint-disable-next-line react-hooks/refs
-  if (!isMounted) {
+  if (!mounted) {
     // 避免 hydration mismatch，未掛載前顯示佔位
     return (
       <button
