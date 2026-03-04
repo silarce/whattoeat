@@ -10,6 +10,7 @@ type WheelSectionProps = {
   isSpinning: boolean;
   onSpin: () => void;
   onRandomize: () => void;
+  onClear: () => void;
   onSelect?: (restaurant: Restaurant) => void;
 };
 
@@ -19,6 +20,7 @@ export function WheelSection({
   isSpinning,
   onSpin,
   onRandomize,
+  onClear,
   onSelect,
 }: WheelSectionProps) {
   return (
@@ -38,6 +40,14 @@ export function WheelSection({
             </Button>
             <Button variant="secondary" size="lg" onClick={onRandomize}>
               🔀 抽十個
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={onClear}
+              disabled={items.length === 0}
+            >
+              🗑️ 清空
             </Button>
           </div>
         </div>

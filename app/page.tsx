@@ -49,8 +49,8 @@ export default function Home() {
         if (filtered.length === 0) {
           return;
         }
-        wheel.fillRandom(filtered);
-        setManualWheelIds([]);
+        const picked = wheel.fillRandom(filtered);
+        setManualWheelIds(picked.map((r) => r.id));
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,8 +79,8 @@ export default function Home() {
           searchHook.applyBand(newBand, location);
           const filtered = filterByDistance(all, location.lat, location.lng, bandDef.maxMeters);
           if (filtered.length > 0) {
-            wheel.fillRandom(filtered);
-            setManualWheelIds([]);
+            const picked = wheel.fillRandom(filtered);
+            setManualWheelIds(picked.map((r) => r.id));
           }
         })();
         return;
@@ -96,8 +96,8 @@ export default function Home() {
       );
 
       if (filtered.length > 0) {
-        wheel.fillRandom(filtered);
-        setManualWheelIds([]);
+        const picked = wheel.fillRandom(filtered);
+        setManualWheelIds(picked.map((r) => r.id));
       }
     },
     [geo.location, searchHook, wheel],
@@ -110,9 +110,14 @@ export default function Home() {
 
   const handleRandomize = useCallback(() => {
     if (searchHook.restaurants.length === 0) return;
-    wheel.fillRandom(searchHook.restaurants);
-    setManualWheelIds([]);
+    const picked = wheel.fillRandom(searchHook.restaurants);
+    setManualWheelIds(picked.map((r) => r.id));
   }, [searchHook.restaurants, wheel]);
+
+  const handleClearWheel = useCallback(() => {
+    wheel.setItems([]);
+    setManualWheelIds([]);
+  }, [wheel]);
 
   const handleToggleWheel = useCallback(
     (id: string) => {
@@ -206,6 +211,7 @@ export default function Home() {
               isSpinning={wheel.isSpinning}
               onSpin={handleSpin}
               onRandomize={handleRandomize}
+              onClear={handleClearWheel}
               onSelect={handleSelectRestaurant}
             />
 
