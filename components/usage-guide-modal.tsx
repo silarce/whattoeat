@@ -7,6 +7,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 import guideImg from "@/public/img/guide_1.png";
+import { XIcon } from "./icons";
 
 const STORAGE_KEY = "whattoeat_hide_guide";
 
@@ -42,7 +43,7 @@ function UsageGuideContent() {
             aria-label="關閉"
             className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors dark:hover:bg-gray-800 dark:hover:text-gray-300 cursor-pointer"
           >
-            ✕
+            <XIcon />
           </button>
         </div>
 
