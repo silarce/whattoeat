@@ -37,7 +37,12 @@ export function Header({
           {onOpenGuide && (
             <button
               onClick={onOpenGuide}
-              className="mt-1 text-xs text-gray-400 underline hover:text-orange-500 transition-colors dark:text-gray-500 dark:hover:text-orange-400"
+              className={cn(
+                "mt-1 text-xs text-gray-400 underline  transition-colors cursor-pointer",
+                "hover:text-orange-500",
+                "dark:text-gray-500 dark:hover:text-orange-400",
+
+              )}
             >
               使用說明
             </button>

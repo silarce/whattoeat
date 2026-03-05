@@ -4,6 +4,7 @@ import { showModal, useModalClose } from "@/lib/show-modal";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 import guideImg from "@/public/img/guide_1.png";
 
@@ -27,11 +28,23 @@ function UsageGuideContent() {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+    <div className={cn(
+      "rounded-2xl bg-white p-6 shadow-2xl",
+      "dark:bg-gray-900"
+    )}>
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-          📖 使用說明
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            📖 使用說明
+          </h2>
+          <button
+            onClick={close}
+            aria-label="關閉"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors dark:hover:bg-gray-800 dark:hover:text-gray-300 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
 
         <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
           <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
@@ -91,6 +104,11 @@ function UsageGuideContent() {
             </p>
             <p>
               喜歡的餐廳可以加入收藏，下次就能快速找到！
+            </p>
+          </div>
+          <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
+            <p>
+              {'若要再次查看說明請點擊左上小的小字"使用說明"'}
             </p>
           </div>
         </div>
