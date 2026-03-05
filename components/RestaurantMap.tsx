@@ -163,6 +163,7 @@ export default function RestaurantMap({
           // mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID",
           mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID,
           colorScheme: isDarkRef.current ? "DARK" : "LIGHT",
+          gestureHandling: "greedy",
         });
 
         mapInstanceRef.current = map;
