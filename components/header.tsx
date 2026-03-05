@@ -10,6 +10,7 @@ type HeaderProps = {
   isLocating: boolean;
   onLocate: () => void;
   onOpenDrawer?: () => void;
+  onOpenGuide?: () => void;
   /** 用於在 burger 上顯示餐廳數量 badge */
   restaurantCount?: number;
 };
@@ -18,6 +19,7 @@ export function Header({
   isLocating,
   onLocate,
   onOpenDrawer,
+  onOpenGuide,
   restaurantCount,
 }: HeaderProps) {
   return (
@@ -32,6 +34,14 @@ export function Header({
           )}>
             🍽️ 吃什麼?
           </h1>
+          {onOpenGuide && (
+            <button
+              onClick={onOpenGuide}
+              className="mt-1 text-xs text-gray-400 underline hover:text-orange-500 transition-colors dark:text-gray-500 dark:hover:text-orange-400"
+            >
+              使用說明
+            </button>
+          )}
         </div>
 
         <ThemeToggle />

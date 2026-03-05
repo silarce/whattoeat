@@ -1,0 +1,96 @@
+"use client";
+
+import { showModal, useModalClose } from "@/lib/show-modal";
+import { Button } from "@/components/ui/button";
+
+const STORAGE_KEY = "whattoeat_hide_guide";
+
+function getHideGuide(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(STORAGE_KEY) === "1";
+}
+
+function setHideGuide() {
+  localStorage.setItem(STORAGE_KEY, "1");
+}
+
+function UsageGuideContent() {
+  const close = useModalClose();
+
+  const handleDontShowAgain = () => {
+    setHideGuide();
+    close();
+  };
+
+  return (
+    <div className="rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          📖 使用說明
+        </h2>
+
+        <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+          <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
+            <p className="font-medium text-gray-900 dark:text-gray-100">
+              Step 1 — 定位
+            </p>
+            <p>
+              進入網站後會自動請求定位權限，允許後即可搜尋附近餐廳。也可隨時點擊「🔄 重新定位」更新位置。
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
+            <p className="font-medium text-gray-900 dark:text-gray-100">
+              Step 2 — 瀏覽與挑選
+            </p>
+            <p>
+              搜尋結果會顯示在右側列表（手機請點右上角 ☰ 開啟）。可切換距離範圍，也可手動將餐廳加入或移出轉盤。
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
+            <p className="font-medium text-gray-900 dark:text-gray-100">
+              Step 3 — 轉盤決定
+            </p>
+            <p>
+              點擊「開始轉」讓轉盤隨機幫你選一家餐廳！也可以點「隨機換一批」重新填充轉盤。
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
+            <p className="font-medium text-gray-900 dark:text-gray-100">
+              Step 4 — 收藏
+            </p>
+            <p>
+              喜歡的餐廳可以加入收藏，下次就能快速找到！
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <button
+            onClick={handleDontShowAgain}
+            className="text-xs text-gray-400 underline hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            不再顯示
+          </button>
+          <Button variant="primary" size="md" onClick={close}>
+            我知道了！
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 命令式呼叫使用說明 Modal */
+export function showUsageGuide() {
+  return showModal(<UsageGuideContent />);
+}
+
+/** 首次進入時自動顯示（若未設定「不再顯示」） */
+export function showUsageGuideIfNeeded() {
+  if (!getHideGuide()) {
+    showUsageGuide();
+  }
+}
