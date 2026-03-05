@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 type HeaderProps = {
-  // status: string;
   isLocating: boolean;
-  hasFailed: boolean;
   onLocate: () => void;
   onOpenDrawer?: () => void;
   /** 用於在 burger 上顯示餐廳數量 badge */
@@ -15,9 +13,7 @@ type HeaderProps = {
 };
 
 export function Header({
-  // status,
   isLocating,
-  hasFailed,
   onLocate,
   onOpenDrawer,
   restaurantCount,
@@ -33,13 +29,11 @@ export function Header({
 
         <ThemeToggle />
 
-        {(isLocating || hasFailed) && (
-          <div className="shrink-0">
-            <Button variant="secondary" onClick={onLocate} disabled={isLocating}>
-              {isLocating ? "定位中…" : "🔄 重新定位"}
-            </Button>
-          </div>
-        )}
+        <div className="shrink-0">
+          <Button variant="secondary" onClick={onLocate} disabled={isLocating}>
+            {isLocating ? "定位中…" : "🔄 重新定位"}
+          </Button>
+        </div>
 
         {/* Burger menu — 僅在 < lg 顯示 */}
         {onOpenDrawer && (

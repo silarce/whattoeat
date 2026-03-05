@@ -45,19 +45,21 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 定位成功且尚未搜尋時，自動搜尋一次
+  // 定位成功時重新搜尋（涵蓋首次載入與重新定位後移動的情況）
   useEffect(() => {
-    if (geo.location && searchHook.allRestaurants.length === 0 && !searchHook.isSearching) {
-      const location = geo.location;
-      (async () => {
-        const { filtered } = await searchHook.search(location);
-        if (filtered.length === 0) {
-          return;
-        }
-        const picked = wheel.fillRandom(filtered);
-        setManualWheelIds(picked.map((r) => r.id));
-      })();
-    }
+    if (!geo.location || searchHook.isSearching) return;
+    const location = geo.location;
+    // 重置上一次的選擇狀態
+    setMapTarget(null);
+    setExtraMapRestaurant(null);
+    wheel.clearSelection();
+    setManualWheelIds([]);
+    (async () => {
+      const { filtered } = await searchHook.search(location);
+      if (filtered.length === 0) return;
+      const picked = wheel.fillRandom(filtered);
+      setManualWheelIds(picked.map((r) => r.id));
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo.location]);
 
@@ -203,7 +205,6 @@ export default function Home() {
       <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
       <Header
         isLocating={geo.isLocating}
-        hasFailed={!!geo.error || geo.permissionDenied}
         onLocate={handleLocate}
         onOpenDrawer={() => setDrawerOpen(true)}
         restaurantCount={searchHook.restaurants.length}
