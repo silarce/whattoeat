@@ -18,6 +18,7 @@ import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
+import { GpsOffModal } from "@/components/gps-off-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -215,6 +216,20 @@ export default function Home() {
           onClose={geo.clearPermissionDenied}
           onRetry={geo.locate}
         />
+
+        {/* GPS Off Modal — 行動裝置且精度極差時顯示 */}
+        <GpsOffModal
+          isOpen={geo.gpsOff}
+          onClose={geo.clearGpsOff}
+        />
+
+        {/* 定位精度警告 */}
+        {geo.accuracyWarning && (
+          <div className="flex items-start gap-2 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">
+            <span className="mt-0.5 shrink-0">⚠️</span>
+            <span>{geo.accuracyWarning}</span>
+          </div>
+        )}
 
         {/* Main 2-column layout */}
         <div className="grid gap-6 lg:grid-cols-5">
