@@ -77,22 +77,53 @@ export default function RestaurantMap({
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)}&query_place_id=${restaurant.id}`
         : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name)}`;
 
+      const dark = isDarkRef.current;
+      const bg = dark ? "#2b2b2b" : "#fff";
+      const titleColor = dark ? "#e8eaed" : "#202124";
+      const addrColor = dark ? "#9aa0a6" : "#70757a";
+      const borderColor = dark ? "#3c4043" : "#e8eaed";
+      const linkColor = dark ? "#8ab4f8" : "#1a73e8";
+
       infoWindowRef.current.setContent(
-        `<div style="font-family:'Google Sans',Roboto,Arial,sans-serif;min-width:160px;max-width:240px;padding:0">
+        `<div style="font-family:'Google Sans',Roboto,Arial,sans-serif;min-width:160px;max-width:240px;padding:0;background:${bg};border-radius:8px">
           <div style="padding:12px 14px 4px">
-            <div style="font-size:16px;font-weight:500;color:#202124;line-height:1.3;margin-bottom:4px">${restaurant.name}</div>
+            <div style="font-size:16px;font-weight:500;color:${titleColor};line-height:1.3;margin-bottom:4px">${restaurant.name}</div>
             ${restaurant.address
-          ? `<div style="font-size:13px;color:#70757a;line-height:1.4;margin-top:4px">${restaurant.address}</div>`
+          ? `<div style="font-size:13px;color:${addrColor};line-height:1.4;margin-top:4px">${restaurant.address}</div>`
           : ""}
           </div>
-          <div style="border-top:1px solid #e8eaed;margin-top:8px;padding:8px 14px">
+          <div style="border-top:1px solid ${borderColor};margin-top:8px;padding:8px 14px">
             <a href="${mapsUrl}" target="_blank" rel="noopener"
-              style="font-size:13px;color:#1a73e8;text-decoration:none;font-weight:400">
+              style="font-size:13px;color:${linkColor};text-decoration:none;font-weight:400">
               在 Google 地圖上查看
             </a>
           </div>
         </div>`,
       );
+
+      // 覆寫 InfoWindow 外框容器的背景色與邊框
+      google.maps.event.addListenerOnce(infoWindowRef.current, "domready", () => {
+        const iwOuter = document.querySelector(".gm-style-iw-c") as HTMLElement | null;
+        if (iwOuter) {
+          iwOuter.style.background = bg;
+          iwOuter.style.padding = "0";
+          iwOuter.style.boxShadow = dark
+            ? "0 2px 7px 1px rgba(0,0,0,.5)"
+            : "";
+          iwOuter.style.border = dark ? "1px solid #3c4043" : "";
+        }
+        const iwBg = document.querySelector(".gm-style-iw-d") as HTMLElement | null;
+        if (iwBg) {
+          iwBg.style.background = bg;
+          iwBg.style.overflow = "auto";
+        }
+        // 三角箭頭
+        const iwTail = document.querySelector(".gm-style-iw-tc") as HTMLElement | null;
+        if (iwTail) {
+          const inner = iwTail.firstElementChild as HTMLElement | null;
+          if (inner) inner.style.background = bg;
+        }
+      });
 
       infoWindowRef.current.open({ anchor, map });
     },
