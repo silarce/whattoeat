@@ -48,6 +48,10 @@ function UsageGuideContent() {
         </div>
 
         <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+          <div className="rounded-xl bg-orange-50 p-4 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200">
+            <p>專為「選擇困難症」設計！自動搜尋附近餐廳，透過趣味轉盤隨機幫你決定下一餐，輕鬆解決用餐煩惱。</p>
+          </div>
+
           <div className="rounded-xl bg-gray-50 p-4 space-y-2 dark:bg-gray-800">
             <p className="font-medium text-gray-900 dark:text-gray-100">
               Step 1 — 定位
