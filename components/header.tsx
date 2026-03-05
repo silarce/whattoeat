@@ -3,11 +3,11 @@ import { MenuIcon } from "@/components/icons";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { cn } from "@/lib/utils";
+
 
 type HeaderProps = {
-  // status: string;
   isLocating: boolean;
-  hasFailed: boolean;
   onLocate: () => void;
   onOpenDrawer?: () => void;
   /** 用於在 burger 上顯示餐廳數量 badge */
@@ -15,9 +15,7 @@ type HeaderProps = {
 };
 
 export function Header({
-  // status,
   isLocating,
-  hasFailed,
   onLocate,
   onOpenDrawer,
   restaurantCount,
@@ -26,20 +24,23 @@ export function Header({
     <header className="border-b border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900">
       <div className="min-h-20 mx-auto flex max-w-6xl items-center gap-4 px-4 py-5 sm:px-6">
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          {/* <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100"> */}
+          <h1 className={cn(
+            "text-xl font-bold tracking-tight text-gray-900 ",
+            "sm:text-2xl",
+            "dark:text-gray-100",
+          )}>
             🍽️ 吃什麼?
           </h1>
         </div>
 
         <ThemeToggle />
 
-        {(isLocating || hasFailed) && (
-          <div className="shrink-0">
-            <Button variant="secondary" onClick={onLocate} disabled={isLocating}>
-              {isLocating ? "定位中…" : "🔄 重新定位"}
-            </Button>
-          </div>
-        )}
+        <div className="shrink-0">
+          <Button variant="secondary" onClick={onLocate} disabled={isLocating}>
+            {isLocating ? "定位中…" : "🔄 重新定位"}
+          </Button>
+        </div>
 
         {/* Burger menu — 僅在 < lg 顯示 */}
         {onOpenDrawer && (
