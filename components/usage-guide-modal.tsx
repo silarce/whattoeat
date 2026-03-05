@@ -2,6 +2,10 @@
 
 import { showModal, useModalClose } from "@/lib/show-modal";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
+
+import guideImg from "@/public/img/guide_1.png";
 
 const STORAGE_KEY = "whattoeat_hide_guide";
 
@@ -36,6 +40,30 @@ function UsageGuideContent() {
             </p>
             <p>
               進入網站後會自動請求定位權限，允許後即可搜尋附近餐廳。也可隨時點擊「🔄 重新定位」更新位置。
+              若沒有出現設置定位權限的提示，請先重新整理網頁試試。
+              若無效則請參考附圖操作。
+              <br />
+              若使用移動裝置，請參考
+              <br />
+              <Link href="https://share.google/aimode/gfkK95m9GOUtt8kur"
+                className="underline text-orange-500 hover:text-orange-400"
+                target="_blank"
+              >
+                手機定位權限設置指南
+              </Link>
+              <br />
+              <Link href="https://share.google/aimode/bBv99TYQTzrlN3ddV"
+                className="underline text-orange-500 hover:text-orange-400"
+                target="_blank"
+              >
+                手機定位權限解除封鎖指南
+              </Link>
+
+              <Image
+                src={guideImg}
+                alt="瀏覽器定位權限設置示意圖"
+                className="mt-2 rounded-md border"
+              />
             </p>
           </div>
 
@@ -53,7 +81,7 @@ function UsageGuideContent() {
               Step 3 — 轉盤決定
             </p>
             <p>
-              點擊「開始轉」讓轉盤隨機幫你選一家餐廳！也可以點「隨機換一批」重新填充轉盤。
+              點擊「開始轉」讓轉盤隨機幫你選一家餐廳！也可以點「抽十個」重新填充轉盤。
             </p>
           </div>
 
@@ -67,13 +95,13 @@ function UsageGuideContent() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleDontShowAgain}
-            className="text-xs text-gray-400 underline hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-          >
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="secondary" size="md" onClick={() => {
+            close();
+            handleDontShowAgain()
+          }}>
             不再顯示
-          </button>
+          </Button>
           <Button variant="primary" size="md" onClick={close}>
             我知道了！
           </Button>
