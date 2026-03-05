@@ -19,6 +19,7 @@ import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 import { GpsOffModal } from "@/components/gps-off-modal";
+import { showUsageGuide, showUsageGuideIfNeeded } from "@/components/usage-guide-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -42,6 +43,8 @@ export default function Home() {
   // 掛載後自動定位
   useEffect(() => {
     geo.locate();
+    // 首次進入檢查是否顯示使用說明
+    showUsageGuideIfNeeded();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -207,6 +210,7 @@ export default function Home() {
         isLocating={geo.isLocating}
         onLocate={handleLocate}
         onOpenDrawer={() => setDrawerOpen(true)}
+        onOpenGuide={() => showUsageGuide()}
         restaurantCount={searchHook.restaurants.length}
       />
 

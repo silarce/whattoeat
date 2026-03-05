@@ -24,16 +24,18 @@ function ModalShell({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-40 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/50"
         aria-hidden="true"
         onClick={onClose}
       />
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md">
-        {children}
+      {/* Scroll wrapper */}
+      <div className="relative z-10 flex min-h-full items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md">
+          {children}
+        </div>
       </div>
     </div>
   );
