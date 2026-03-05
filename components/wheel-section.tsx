@@ -41,7 +41,7 @@ export function WheelSection({
               {isSpinning ? "旋轉中…" : "🎲 開始抽選"}
             </Button>
             <Button variant="secondary" size="md" onClick={onRandomize}>
-              🔀 抽十個
+              🔀 抽備選餐廳
             </Button>
             <Button
               variant="secondary"
