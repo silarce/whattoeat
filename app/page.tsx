@@ -18,6 +18,7 @@ import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
+import { GpsOffModal } from "@/components/gps-off-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -214,6 +215,12 @@ export default function Home() {
           isOpen={geo.permissionDenied}
           onClose={geo.clearPermissionDenied}
           onRetry={geo.locate}
+        />
+
+        {/* GPS Off Modal — 行動裝置且精度極差時顯示 */}
+        <GpsOffModal
+          isOpen={geo.gpsOff}
+          onClose={geo.clearGpsOff}
         />
 
         {/* 定位精度警告 */}

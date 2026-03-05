@@ -11,7 +11,16 @@ type GeolocationState = {
   /** 定位精度偏低時的提示（不影響定位流程） */
   accuracyWarning: string | null;
   permissionDenied: boolean;
+  /** 行動裝置且精度極差（> 300m），推斷 GPS 未開啟 */
+  gpsOff: boolean;
 };
+
+/** 判斷是否為行動裝置（在瀏覽器呼叫，無 SSR 問題） */
+function isMobileDevice(): boolean {
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  );
+}
 
 /**
  * 封裝瀏覽器 Geolocation API 的 hook
@@ -24,6 +33,7 @@ export function useGeolocation() {
     error: null,
     accuracyWarning: null,
     permissionDenied: false,
+    gpsOff: false,
   });
 
   const locate = useCallback(() => {
@@ -36,11 +46,14 @@ export function useGeolocation() {
       return;
     }
 
-    setState((prev) => ({ ...prev, isLocating: true, error: null, accuracyWarning: null, permissionDenied: false }));
+    setState((prev) => ({ ...prev, isLocating: true, error: null, accuracyWarning: null, permissionDenied: false, gpsOff: false }));
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const accuracy = position.coords.accuracy;
+        const mobile = isMobileDevice();
+        // 行動裝置且誤差 > 300m 推斷 GPS 未開啟
+        const gpsOff = mobile && accuracy > 300;
         setState({
           location: {
             lat: position.coords.latitude,
@@ -50,10 +63,12 @@ export function useGeolocation() {
           isLocating: false,
           error: null,
           // 精度誤差半徑超過 150m（常見於純 Wi-Fi / 網路定位），距離帶結果僅供參考
-          accuracyWarning: accuracy > 150
+          // 若已顯示 GPS 提示 modal 則不顕示重複的 yellow banner
+          accuracyWarning: !gpsOff && accuracy > 150
             ? `定位精度偏低（誤差約 ${Math.round(accuracy)} 公尺），附近餐廳距離僅供參考`
             : null,
           permissionDenied: false,
+          gpsOff,
         });
       },
       (err) => {
@@ -73,5 +88,9 @@ export function useGeolocation() {
     setState((prev) => ({ ...prev, permissionDenied: false }));
   }, []);
 
-  return { ...state, locate, clearPermissionDenied };
+  const clearGpsOff = useCallback(() => {
+    setState((prev) => ({ ...prev, gpsOff: false }));
+  }, []);
+
+  return { ...state, locate, clearPermissionDenied, clearGpsOff };
 }
