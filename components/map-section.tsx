@@ -1,7 +1,9 @@
 "use client";
 
-import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
+import Container from "@/components/ui/container";
+import SubContainer from "@/components/ui/subContainer";
+
 import type { LatLng, Restaurant } from "@/types/restaurant";
 import RestaurantMap from "@/components/RestaurantMap";
 
@@ -30,8 +32,8 @@ export function MapSection({
       : "https://www.google.com/maps";
 
   return (
-    <CardContainer>
-      <CardBody>
+    <Container>
+      <SubContainer>
         {apiKey && location ? (
           <RestaurantMap
             key={isDark ? "dark" : "light"}
@@ -50,7 +52,7 @@ export function MapSection({
             </p>
           </div>
         )}
-      </CardBody>
-    </CardContainer>
+      </SubContainer>
+    </Container>
   );
 }

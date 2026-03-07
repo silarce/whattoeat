@@ -2,7 +2,9 @@
 
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { CardContainer, CardBody, CardHeader } from "@/components/ui/card";
+import Container from "@/components/ui/container";
+import SubContainer from "@/components/ui/subContainer";
+import Top from "@/components/ui/top";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Restaurant } from "@/types/restaurant";
@@ -51,8 +53,8 @@ export function RestaurantList({
   };
 
   return (
-    <CardContainer className="flex-1 min-h-0 flex flex-col">
-      <CardHeader>
+    <Container className="flex-1 min-h-0 flex flex-col">
+      <Top>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">📋 附近餐廳</h2>
@@ -65,8 +67,8 @@ export function RestaurantList({
             勾選加入轉盤（最多 {MAX_WHEEL_ITEMS} 家）
           </p>
         )}
-      </CardHeader>
-      <CardBody className="flex-1 min-h-0 pb-0 flex flex-col">
+      </Top>
+      <SubContainer className="flex-1 min-h-0 pb-0 flex flex-col">
         {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">附近沒有餐廳</p>
@@ -74,77 +76,77 @@ export function RestaurantList({
         ) : (
           <>
             <div ref={scrollRef} className="flex-1 overflow-auto space-y-2 pb-2">
-            {pagedRestaurants.map((restaurant) => {
-              const checked = manualWheelIds.includes(restaurant.id);
-              const isFav = favoriteIds.includes(restaurant.id);
-              const wheelFull = manualWheelIds.length >= MAX_WHEEL_ITEMS;
-              return (
-                <div
-                  key={restaurant.id}
-                  className={cn(
-                    "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
-                    checked
-                      ? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950"
-                      : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600 dark:hover:bg-gray-750",
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => onToggleWheel(restaurant.id)}
-                    disabled={wheelFull && !checked}
-                    className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label={`加入轉盤：${restaurant.name}`}
-                  />
-
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {restaurant.name}
-                    </p>
-                    {restaurant.address && (
-                      <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
-                        {restaurant.address}
-                      </p>
+              {pagedRestaurants.map((restaurant) => {
+                const checked = manualWheelIds.includes(restaurant.id);
+                const isFav = favoriteIds.includes(restaurant.id);
+                const wheelFull = manualWheelIds.length >= MAX_WHEEL_ITEMS;
+                return (
+                  <div
+                    key={restaurant.id}
+                    className={cn(
+                      "flex items-center gap-2 sm:gap-3 rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 transition-all",
+                      checked
+                        ? "border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950"
+                        : "border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600 dark:hover:bg-gray-750",
                     )}
-                  </div>
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => onToggleWheel(restaurant.id)}
+                      disabled={wheelFull && !checked}
+                      className="h-5 w-5 shrink-0 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label={`加入轉盤：${restaurant.name}`}
+                    />
 
-                  <div className="flex shrink-0 items-center">
-                    <span
-                      className={cn("text-base leading-none", !isFav && "hidden")}
-                      aria-label="已收藏"
-                      aria-hidden={!isFav}
-                    >
-                      ❤️
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewOnMap(restaurant)}
-                      title="在地圖上查看"
-                      className="min-h-11 min-w-11 px-2"
-                    >
-                      <MapPinIcon className="w-5 h-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onSelect(restaurant)}
-                      title="選擇此餐廳"
-                      className="min-h-11 min-w-11 px-2"
-                    >
-                      <InfoIcon className="w-5 h-5" />
-                    </Button>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {restaurant.name}
+                      </p>
+                      {restaurant.address && (
+                        <p className="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">
+                          {restaurant.address}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex shrink-0 items-center">
+                      <span
+                        className={cn("text-base leading-none", !isFav && "hidden")}
+                        aria-label="已收藏"
+                        aria-hidden={!isFav}
+                      >
+                        ❤️
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewOnMap(restaurant)}
+                        title="在地圖上查看"
+                        className="min-h-11 min-w-11 px-2"
+                      >
+                        <MapPinIcon className="w-5 h-5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSelect(restaurant)}
+                        title="選擇此餐廳"
+                        className="min-h-11 min-w-11 px-2"
+                      >
+                        <InfoIcon className="w-5 h-5" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
 
             </div>
             <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
           </>
         )}
-      </CardBody>
-    </CardContainer>
+      </SubContainer>
+    </Container>
   );
 }
 

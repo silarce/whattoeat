@@ -1,6 +1,7 @@
 "use client";
 
-import { CardContainer, CardHeader } from "@/components/ui/card";
+import Container from "@/components/ui/container";
+import Top from "@/components/ui/top";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
@@ -62,10 +63,10 @@ export function SidePanel({
   onRemoveFavorite,
 }: SidePanelProps) {
   return (
-    <CardContainer className="relative h-full flex flex-col">
+    <Container className="relative h-full flex flex-col">
       <LoadingOverlay isLoading={isSearching} message="正在取得店家資料…" />
       <Tabs defaultValue="restaurants" className="flex-1 min-h-0 flex flex-col">
-        <CardHeader>
+        <Top>
           <TabsList>
             <TabsTrigger value="restaurants" className="cursor-pointer">
               📋 附近餐廳
@@ -82,7 +83,7 @@ export function SidePanel({
               )}
             </TabsTrigger>
           </TabsList>
-        </CardHeader>
+        </Top>
 
 
         <TabsContent value="restaurants" className="flex-1 min-h-0 flex flex-col">
@@ -119,6 +120,6 @@ export function SidePanel({
         </TabsContent>
 
       </Tabs>
-    </CardContainer>
+    </Container>
   );
 }
