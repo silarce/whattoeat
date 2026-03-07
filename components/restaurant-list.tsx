@@ -69,7 +69,7 @@ export function RestaurantList({
       <CardBody className="flex-1 min-h-0 pb-0 flex flex-col">
         {totalCount === 0 ? (
           <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400">點擊「搜尋附近餐廳」開始探索</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">附近沒有餐廳</p>
           </div>
         ) : (
           <>
