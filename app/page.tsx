@@ -1,19 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useTheme } from "next-themes";
+import { useMediaQuery } from "usehooks-ts";
+
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
-import type { DistanceBandKey } from "@/lib/constants";
+
 import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
+import type { DistanceBandKey } from "@/lib/constants";
 import { filterByDistance } from "@/lib/places-api";
+import { showModal } from "@/lib/show-modal";
+
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useRestaurantSearch } from "@/hooks/use-restaurant-search";
 import { useWheel } from "@/hooks/use-wheel";
 import { useFavorites } from "@/hooks/use-favorites";
+
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
 import { WinnerCard } from "@/components/winner-card";
-import { showModal } from "@/lib/show-modal";
 import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
@@ -21,7 +27,6 @@ import { LocationPermissionModal } from "@/components/location-permission-modal"
 import { GpsOffModal } from "@/components/gps-off-modal";
 import { showUsageGuide, showUsageGuideIfNeeded } from "@/components/usage-guide-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { useMediaQuery } from "usehooks-ts";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -35,7 +40,7 @@ export default function Home() {
   const isDark = resolvedTheme === "dark";
 
   const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
-  
+
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
