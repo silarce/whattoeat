@@ -34,13 +34,15 @@ export default function Home() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
+  
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
+  
 
 
   // --- Handlers ---
@@ -206,7 +208,7 @@ export default function Home() {
   }, [wheel.isSpinning, wheel.winner, handleSelectRestaurant]);
 
   // region --- Render ---
-  
+
   const sidePanel = <SidePanel
     totalCount={searchHook.restaurants.length}
     pagedRestaurants={searchHook.pagedRestaurants}
@@ -302,7 +304,10 @@ export default function Home() {
 
         {/* Mobile / Tablet Drawer */}
         {!isDesktop && (
-          <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
+          <Drawer
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            title="📋 餐廳列表"          >
             {sidePanel}
           </Drawer>
         )}
