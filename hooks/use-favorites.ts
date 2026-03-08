@@ -1,9 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { FavoriteRestaurant, RestaurantData } from "@/types/restaurant";
+import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
 import { toFavorite } from "@/types/restaurant";
-import { getFavorites, addFavorite as dbAdd, removeFavorite as dbRemove } from "@/lib/favorites-db";
+import {
+  getFavorites,
+  addFavorite as dbAdd,
+  removeFavorite as dbRemove,
+} from "@/lib/favorites-db";
 import { PAGE_SIZE } from "@/lib/constants";
 
 /**
@@ -18,16 +22,24 @@ export function useFavorites() {
     getFavorites()
       .then(setFavorites)
       .catch(() => {
-        alert("取得收藏資料失敗，請確認您使用的是主流瀏覽器且已允許使用 IndexedDB");
+        alert(
+          "取得收藏資料失敗，請確認您使用的是主流瀏覽器且已允許使用 IndexedDB",
+        );
       })
       .finally(() => setIsLoading(false));
   }, []);
 
-  const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites]);
+  const favoriteIds = useMemo(
+    () => new Set(favorites.map((item) => item.id)),
+    [favorites],
+  );
 
-  const isFavorite = useCallback((id: string) => favoriteIds.has(id), [favoriteIds]);
+  const isFavorite = useCallback(
+    (id: string) => favoriteIds.has(id),
+    [favoriteIds],
+  );
 
-  const add = useCallback(async (restaurant: RestaurantData) => {
+  const add = useCallback(async (restaurant: Restaurant) => {
     await dbAdd(toFavorite(restaurant));
     const next = await getFavorites();
     setFavorites(next);

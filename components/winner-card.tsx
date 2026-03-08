@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useModalClose } from "@/lib/show-modal";
-import type { RestaurantData } from "@/types/restaurant";
+import type { Restaurant } from "@/types/restaurant";
 
 type WinnerCardProps = {
-  winner: RestaurantData;
+  winner: Restaurant;
   checkIsFavorite: () => boolean;
   onAddFavorite: () => Promise<void> | void;
   onRemoveFavorite: () => Promise<void> | void;

@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { RestaurantData } from "@/types/restaurant";
+import type { Restaurant } from "@/types/restaurant";
 import { pickRandom } from "@/lib/utils";
 import { MAX_WHEEL_ITEMS } from "@/lib/constants";
 
 type WheelState = {
-  items: RestaurantData[];
+  items: Restaurant[];
   selectedIndex: number;
   isSpinning: boolean;
-  winner: RestaurantData | null;
+  winner: Restaurant | null;
 };
 
 /**
@@ -24,11 +24,11 @@ export function useWheel() {
   });
   const timerRef = useRef<number | null>(null);
   // ref 鏡像，讓 spin() 不需要依賴 state 就能讀到最新項目
-  const itemsRef = useRef<RestaurantData[]>([]);
+  const itemsRef = useRef<Restaurant[]>([]);
   const isSpinningRef = useRef(false);
 
   /** 以隨機選取的餐廳填入轉盤 */
-  const fillRandom = useCallback((restaurants: RestaurantData[]) => {
+  const fillRandom = useCallback((restaurants: Restaurant[]) => {
     const picked = pickRandom(restaurants, MAX_WHEEL_ITEMS);
     itemsRef.current = picked;
     setState({
@@ -41,15 +41,20 @@ export function useWheel() {
   }, []);
 
   /** 手動設定轉盤項目 */
-  const setItems = useCallback((items: RestaurantData[]) => {
+  const setItems = useCallback((items: Restaurant[]) => {
     const next = items.slice(0, MAX_WHEEL_ITEMS);
     itemsRef.current = next;
     setState((prev) => {
       // 找出目前被選中的餐廳 ID
-      const selectedId = prev.selectedIndex >= 0 ? prev.items[prev.selectedIndex]?.id : undefined;
+      const selectedId =
+        prev.selectedIndex >= 0
+          ? prev.items[prev.selectedIndex]?.id
+          : undefined;
       // 在新陣列中尋找同一間餐廳
       const newSelectedIndex =
-        selectedId !== undefined ? next.findIndex((r) => r.id === selectedId) : -1;
+        selectedId !== undefined
+          ? next.findIndex((r) => r.id === selectedId)
+          : -1;
       return {
         ...prev,
         items: next,
@@ -61,9 +66,12 @@ export function useWheel() {
   }, []);
 
   /** 加入單一項目到轉盤 */
-  const addItem = useCallback((item: RestaurantData) => {
+  const addItem = useCallback((item: Restaurant) => {
     setState((prev) => {
-      if (prev.items.length >= MAX_WHEEL_ITEMS || prev.items.some((i) => i.id === item.id)) {
+      if (
+        prev.items.length >= MAX_WHEEL_ITEMS ||
+        prev.items.some((i) => i.id === item.id)
+      ) {
         return prev;
       }
       const next = [...prev.items, item];
@@ -73,9 +81,11 @@ export function useWheel() {
   }, []);
 
   /** 直接挑選某餐廳為贏家 (不經轉盤動畫) */
-  const pickDirect = useCallback((restaurant: RestaurantData) => {
+  const pickDirect = useCallback((restaurant: Restaurant) => {
     setState((prev) => {
-      const nextIndex = prev.items.findIndex((item) => item.id === restaurant.id);
+      const nextIndex = prev.items.findIndex(
+        (item) => item.id === restaurant.id,
+      );
       return {
         ...prev,
         selectedIndex: nextIndex >= 0 ? nextIndex : prev.selectedIndex,
@@ -86,7 +96,7 @@ export function useWheel() {
   }, []);
 
   /** 立即選出贏家 (搜尋後自動抽選) */
-  const autoSelect = useCallback((items: RestaurantData[]) => {
+  const autoSelect = useCallback((items: Restaurant[]) => {
     const finalIndex = Math.floor(Math.random() * items.length);
     const selected = items[finalIndex];
     setState((prev) => ({

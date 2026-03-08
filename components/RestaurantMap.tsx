@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import type { RestaurantData } from "@/types/restaurant";
+import type { Restaurant } from "@/types/restaurant";
 import { makePinSvg, locationDotSvg } from "@/lib/map-icons";
 
 type RestaurantMapProps = {
   apiKey: string;
   location: { lat: number; lng: number };
-  restaurants: RestaurantData[];
-  extraRestaurant?: RestaurantData | null;
-  selectedRestaurant: RestaurantData | null;
+  restaurants: Restaurant[];
+  extraRestaurant?: Restaurant | null;
+  selectedRestaurant: Restaurant | null;
   isDark?: boolean;
-  onSelectRestaurant: (restaurant: RestaurantData) => void;
+  onSelectRestaurant: (restaurant: Restaurant) => void;
 };
 
 // zoom 閾値：超過此値就隱藏自訂 label（預留給 Google 原生 POI 標籤）
@@ -64,7 +64,7 @@ export default function RestaurantMap({
 
   /** 開啟 InfoWindow 並顯示餐廳資訊 — 用 ref 儲存避免 useCallback 順序問題 */
   const openInfoWindowFn = useCallback(
-    (anchor: google.maps.marker.AdvancedMarkerElement, restaurant: RestaurantData) => {
+    (anchor: google.maps.marker.AdvancedMarkerElement, restaurant: Restaurant) => {
       const mapsModule = mapsModuleRef.current;
       const map = mapInstanceRef.current;
       if (!mapsModule || !map) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { LatLng, RestaurantData } from "@/types/restaurant";
+import type { LatLng, Restaurant } from "@/types/restaurant";
 import {
   searchAllNearby,
   filterByDistance,
@@ -15,9 +15,9 @@ const PAGE_SIZE = 10;
 
 type SearchState = {
   /** API 回傳的完整列表（最大距離帶內） */
-  allRestaurants: RestaurantData[];
+  allRestaurants: Restaurant[];
   /** 目前距離帶過濾後的列表 */
-  restaurants: RestaurantData[];
+  restaurants: Restaurant[];
   isSearching: boolean;
   error: string | null;
 };
@@ -55,12 +55,22 @@ export function useRestaurantSearch() {
       // 預設先用「近」過濾
       const nearBand = DISTANCE_BANDS.find((b) => b.key === "near")!;
       const filtered = sortByDistance(
-        filterByDistance(results, location.lat, location.lng, nearBand.maxMeters),
+        filterByDistance(
+          results,
+          location.lat,
+          location.lng,
+          nearBand.maxMeters,
+        ),
         location.lat,
         location.lng,
       );
 
-      setState({ allRestaurants: results, restaurants: filtered, isSearching: false, error: null });
+      setState({
+        allRestaurants: results,
+        restaurants: filtered,
+        isSearching: false,
+        error: null,
+      });
       return { all: results, filtered };
     } catch {
       const fallback = createMockRestaurants(location.lat, location.lng);
@@ -79,7 +89,12 @@ export function useRestaurantSearch() {
     setState((prev) => {
       const bandDef = DISTANCE_BANDS.find((b) => b.key === band)!;
       const filtered = sortByDistance(
-        filterByDistance(prev.allRestaurants, location.lat, location.lng, bandDef.maxMeters),
+        filterByDistance(
+          prev.allRestaurants,
+          location.lat,
+          location.lng,
+          bandDef.maxMeters,
+        ),
         location.lat,
         location.lng,
       );
@@ -95,7 +110,8 @@ export function useRestaurantSearch() {
   const safePage = page >= totalPages ? 0 : page;
 
   const pagedRestaurants = useMemo(
-    () => state.restaurants.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
+    () =>
+      state.restaurants.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
     [state.restaurants, safePage],
   );
 
