@@ -47,7 +47,7 @@ export default function Home() {
   const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  
+
 
 
   // --- Handlers ---
@@ -215,28 +215,32 @@ export default function Home() {
   // region --- Render ---
 
   const sidePanel = <SidePanel
-    totalCount={searchHook.restaurants.length}
-    pagedRestaurants={searchHook.pagedRestaurants}
-    page={searchHook.page}
-    totalPages={searchHook.totalPages}
-    onPageChange={searchHook.setPage}
     manualWheelIds={manualWheelIds}
-    favoriteIds={favs.favorites.map((f) => f.id)}
-    band={band}
-    hasLocation={!!geo.location}
-    isSearching={searchHook.isSearching}
-    onToggleWheel={handleToggleWheel}
-    onSelect={handleSelectRestaurant}
-    onViewOnMap={handleViewOnMap}
-    onBandChange={handleBandChange}
-    favorites={favs.favorites}
-    pagedFavorites={favs.pagedFavorites}
-    favPage={favs.page}
-    favTotalPages={favs.totalPages}
-    onFavPageChange={favs.setPage}
-    onToggleFavWheel={handleToggleWheel}
-    onSelectFav={(fav) => handleSelectRestaurant(fav as Restaurant)}
-    onRemoveFavorite={favs.remove}
+    restaurantList={{
+      totalCount: searchHook.restaurants.length,
+      pagedRestaurants: searchHook.pagedRestaurants,
+      page: searchHook.page,
+      totalPages: searchHook.totalPages,
+      onPageChange: searchHook.setPage,
+      favoriteIds: favs.favorites.map((f) => f.id),
+      band: band,
+      hasLocation: !!geo.location,
+      isSearching: searchHook.isSearching,
+      onToggleWheel: handleToggleWheel,
+      onSelect: handleSelectRestaurant,
+      onViewOnMap: handleViewOnMap,
+      onBandChange: handleBandChange,
+    }}
+    favoriteList={{
+      favorites: favs.favorites,
+      pagedFavorites: favs.pagedFavorites,
+      favPage: favs.page,
+      favTotalPages: favs.totalPages,
+      onFavPageChange: favs.setPage,
+      onToggleFavWheel: handleToggleWheel,
+      onSelectFav: (fav) => handleSelectRestaurant(fav as Restaurant),
+      onRemoveFavorite: favs.remove,
+    }}
   />
 
 
