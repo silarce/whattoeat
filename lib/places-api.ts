@@ -39,6 +39,7 @@ function parsePlaces(places: Place[]): Restaurant[] {
         id: place.id!,
         name: place.displayName?.text ?? "",
         address: place.formattedAddress,
+        phone: place.nationalPhoneNumber,
         lat: place.location?.latitude,
         lng: place.location?.longitude,
         rating: place.rating,
