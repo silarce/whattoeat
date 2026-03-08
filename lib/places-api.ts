@@ -1,21 +1,12 @@
-import type { Restaurant } from "@/types/restaurant";
-import {
-  PLACES_API_URL,
-  PLACES_FIELD_MASK,
-  API_SEARCH_RADIUS,
-} from "@/lib/constants";
+import type { RestaurantData } from "@/types/restaurant";
+import { PLACES_API_URL, PLACES_FIELD_MASK, API_SEARCH_RADIUS } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 //  Haversine
 // ---------------------------------------------------------------------------
 
 /** Haversine 公式：計算兩個座標之間的距離（公尺）*/
-export function distanceInMeters(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number,
-): number {
+export function distanceInMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6_371_000;
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
@@ -51,7 +42,7 @@ type PlaceResponse = {
 function parsePlaces(
   places: NonNullable<PlaceResponse["places"]>,
   apiKey: string,
-): Restaurant[] {
+): RestaurantData[] {
   return places
     .filter((place) => place.id && place.displayName?.text)
     .map((place) => {
@@ -70,7 +61,7 @@ function parsePlaces(
         phone: place.nationalPhoneNumber,
         rating: place.rating,
         openNow: place.currentOpeningHours?.openNow,
-      } satisfies Restaurant;
+      } satisfies RestaurantData;
     });
 }
 
@@ -102,7 +93,7 @@ async function searchByTypes(
   lat: number,
   lng: number,
   apiKey: string,
-): Promise<Restaurant[]> {
+): Promise<RestaurantData[]> {
   const body = {
     includedTypes: types,
     maxResultCount: 20,
@@ -147,10 +138,8 @@ export async function searchAllNearby(
   lat: number,
   lng: number,
   apiKey: string,
-): Promise<Restaurant[]> {
-  const searchPromises = SEARCH_TYPE_GROUPS.map((types) =>
-    searchByTypes(types, lat, lng, apiKey),
-  );
+): Promise<RestaurantData[]> {
+  const searchPromises = SEARCH_TYPE_GROUPS.map((types) => searchByTypes(types, lat, lng, apiKey));
 
   const resultsArray = await Promise.all(searchPromises);
   const allRestaurants = resultsArray.flat();
@@ -167,11 +156,11 @@ export async function searchAllNearby(
  * 從完整列表中挑出距離 <= maxMeters 的餐廳（client 端過濾）
  */
 export function filterByDistance(
-  restaurants: Restaurant[],
+  restaurants: RestaurantData[],
   lat: number,
   lng: number,
   maxMeters: number,
-): Restaurant[] {
+): RestaurantData[] {
   return restaurants.filter((r) => {
     if (r.lat == null || r.lng == null) return false;
     return distanceInMeters(lat, lng, r.lat, r.lng) <= maxMeters;
@@ -182,19 +171,13 @@ export function filterByDistance(
  * 依距離由近到遠排序（無座標的項目排到最後）
  */
 export function sortByDistance(
-  restaurants: Restaurant[],
+  restaurants: RestaurantData[],
   lat: number,
   lng: number,
-): Restaurant[] {
+): RestaurantData[] {
   return [...restaurants].sort((a, b) => {
-    const da =
-      a.lat != null && a.lng != null
-        ? distanceInMeters(lat, lng, a.lat, a.lng)
-        : Infinity;
-    const db =
-      b.lat != null && b.lng != null
-        ? distanceInMeters(lat, lng, b.lat, b.lng)
-        : Infinity;
+    const da = a.lat != null && a.lng != null ? distanceInMeters(lat, lng, a.lat, a.lng) : Infinity;
+    const db = b.lat != null && b.lng != null ? distanceInMeters(lat, lng, b.lat, b.lng) : Infinity;
     return da - db;
   });
 }
@@ -202,11 +185,7 @@ export function sortByDistance(
 /**
  * 產生模擬餐廳資料 (API 不可用時的 fallback)
  */
-export function createMockRestaurants(
-  lat: number,
-  lng: number,
-  count = 12,
-): Restaurant[] {
+export function createMockRestaurants(lat: number, lng: number, count = 12): RestaurantData[] {
   // 使用確定性偏移（基於 index），確保每次產生相同的座標與距離
   return Array.from({ length: count }).map((_, index) => {
     const angle = (index / count) * 2 * Math.PI;

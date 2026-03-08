@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { loadGoogleMaps } from "@/lib/google-maps-loader";
-import type { Restaurant } from "@/types/restaurant";
+import type { RestaurantData } from "@/types/restaurant";
 import { makePinSvg, locationDotSvg } from "@/lib/map-icons";
 
 type RestaurantMapProps = {
   apiKey: string;
   location: { lat: number; lng: number };
-  restaurants: Restaurant[];
-  extraRestaurant?: Restaurant | null;
-  selectedRestaurant: Restaurant | null;
+  restaurants: RestaurantData[];
+  extraRestaurant?: RestaurantData | null;
+  selectedRestaurant: RestaurantData | null;
   isDark?: boolean;
-  onSelectRestaurant: (restaurant: Restaurant) => void;
+  onSelectRestaurant: (restaurant: RestaurantData) => void;
 };
 
 // zoom 閾値：超過此値就隱藏自訂 label（預留給 Google 原生 POI 標籤）
@@ -20,7 +20,7 @@ const LABEL_HIDE_ZOOM = 20;
 // 點擊 marker / 選取餐廳時，地圖縮放到的目標 zoom（街道等級）
 const RESTAURANT_FOCUS_ZOOM = 17;
 const MARKER_DEFAULT_COLOR = "#e18646";
-const MARKER_WINNER_COLOR  = "#ef4444";
+const MARKER_WINNER_COLOR = "#ef4444";
 
 const makePinHtml = makePinSvg;
 
@@ -64,7 +64,7 @@ export default function RestaurantMap({
 
   /** 開啟 InfoWindow 並顯示餐廳資訊 — 用 ref 儲存避免 useCallback 順序問題 */
   const openInfoWindowFn = useCallback(
-    (anchor: google.maps.marker.AdvancedMarkerElement, restaurant: Restaurant) => {
+    (anchor: google.maps.marker.AdvancedMarkerElement, restaurant: RestaurantData) => {
       const mapsModule = mapsModuleRef.current;
       const map = mapInstanceRef.current;
       if (!mapsModule || !map) return;

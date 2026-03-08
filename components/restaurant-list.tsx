@@ -7,14 +7,14 @@ import SubContainer from "@/components/ui/subContainer";
 import Top from "@/components/ui/top";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Restaurant } from "@/types/restaurant";
+import type { RestaurantData } from "@/types/restaurant";
 import { MAX_WHEEL_ITEMS, DISTANCE_BANDS, type DistanceBandKey } from "@/lib/constants";
 import { Pagination } from "@/components/ui/pagination";
 import { MapPinIcon, InfoIcon } from "@/components/icons";
 
 type RestaurantListProps = {
   totalCount: number;
-  pagedRestaurants: Restaurant[];
+  pagedRestaurants: RestaurantData[];
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -24,8 +24,8 @@ type RestaurantListProps = {
   hasLocation: boolean;
   isSearching: boolean;
   onToggleWheel: (id: string) => void;
-  onSelect: (restaurant: Restaurant) => void;
-  onViewOnMap: (restaurant: Restaurant) => void;
+  onSelect: (restaurant: RestaurantData) => void;
+  onViewOnMap: (restaurant: RestaurantData) => void;
   onBandChange: (band: DistanceBandKey) => void;
 };
 

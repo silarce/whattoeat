@@ -1,8 +1,13 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import type { LatLng, Restaurant } from "@/types/restaurant";
-import { searchAllNearby, filterByDistance, sortByDistance, createMockRestaurants } from "@/lib/places-api";
+import type { LatLng, RestaurantData } from "@/types/restaurant";
+import {
+  searchAllNearby,
+  filterByDistance,
+  sortByDistance,
+  createMockRestaurants,
+} from "@/lib/places-api";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS } from "@/lib/constants";
 
@@ -10,9 +15,9 @@ const PAGE_SIZE = 10;
 
 type SearchState = {
   /** API 回傳的完整列表（最大距離帶內） */
-  allRestaurants: Restaurant[];
+  allRestaurants: RestaurantData[];
   /** 目前距離帶過濾後的列表 */
-  restaurants: Restaurant[];
+  restaurants: RestaurantData[];
   isSearching: boolean;
   error: string | null;
 };
@@ -32,7 +37,13 @@ export function useRestaurantSearch() {
   const search = useCallback(async (location: LatLng) => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    setState((prev) => ({ ...prev, allRestaurants: [], restaurants: [], isSearching: true, error: null }));
+    setState((prev) => ({
+      ...prev,
+      allRestaurants: [],
+      restaurants: [],
+      isSearching: true,
+      error: null,
+    }));
 
     try {
       if (!apiKey) throw new Error("MISSING_API_KEY");
@@ -45,7 +56,8 @@ export function useRestaurantSearch() {
       const nearBand = DISTANCE_BANDS.find((b) => b.key === "near")!;
       const filtered = sortByDistance(
         filterByDistance(results, location.lat, location.lng, nearBand.maxMeters),
-        location.lat, location.lng,
+        location.lat,
+        location.lng,
       );
 
       setState({ allRestaurants: results, restaurants: filtered, isSearching: false, error: null });
@@ -68,7 +80,8 @@ export function useRestaurantSearch() {
       const bandDef = DISTANCE_BANDS.find((b) => b.key === band)!;
       const filtered = sortByDistance(
         filterByDistance(prev.allRestaurants, location.lat, location.lng, bandDef.maxMeters),
-        location.lat, location.lng,
+        location.lat,
+        location.lng,
       );
       return { ...prev, restaurants: filtered };
     });

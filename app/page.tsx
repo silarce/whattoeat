@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
 
-import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
+import type { FavoriteRestaurant, RestaurantData } from "@/types/restaurant";
 
 import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
 import type { DistanceBandKey } from "@/lib/constants";
@@ -43,8 +43,8 @@ export default function Home() {
 
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
-  const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
-  const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
+  const [mapTarget, setMapTarget] = useState<RestaurantData | null>(null);
+  const [extraMapRestaurant, setExtraMapRestaurant] = useState<RestaurantData | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -126,17 +126,17 @@ export default function Home() {
             : prev;
 
         // 同時從餐廳列表與收藏列表查找，確保兩邊都能加入轉盤
-        const allSources: Restaurant[] = [
+        const allSources: RestaurantData[] = [
           ...searchHook.restaurants,
           ...favs.favorites,
         ];
-        const uniqueMap = new Map<string, Restaurant>();
+        const uniqueMap = new Map<string, RestaurantData>();
         for (const r of allSources) {
           if (!uniqueMap.has(r.id)) uniqueMap.set(r.id, r);
         }
         const selected = nextIds
           .map((nid) => uniqueMap.get(nid))
-          .filter((r): r is Restaurant => !!r);
+          .filter((r): r is RestaurantData => !!r);
         wheel.setItems(selected);
         return nextIds;
       });
@@ -145,7 +145,7 @@ export default function Home() {
   );
 
   const handleSelectRestaurant = useCallback(
-    (restaurant: Restaurant) => {
+    (restaurant: RestaurantData) => {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
       // 若餐廳不在目前搜尋清單中，將其記為額外地圖標記點
@@ -166,8 +166,8 @@ export default function Home() {
     [wheel, favs, searchHook.restaurants],
   );
 
-  const handleViewOnMap = useCallback((restaurant: Restaurant | FavoriteRestaurant) => {
-    setMapTarget(restaurant as Restaurant);
+  const handleViewOnMap = useCallback((restaurant: RestaurantData | FavoriteRestaurant) => {
+    setMapTarget(restaurant as RestaurantData);
   }, []);
 
 
@@ -238,7 +238,7 @@ export default function Home() {
       favTotalPages: favs.totalPages,
       onFavPageChange: favs.setPage,
       onToggleFavWheel: handleToggleWheel,
-      onSelectFav: (fav) => handleSelectRestaurant(fav as Restaurant),
+      onSelectFav: (fav) => handleSelectRestaurant(fav as RestaurantData),
       onRemoveFavorite: favs.remove,
     }}
   />

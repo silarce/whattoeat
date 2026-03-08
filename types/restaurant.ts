@@ -3,7 +3,7 @@ export type LatLng = {
   lng: number;
 };
 
-export type Restaurant = {
+export type RestaurantData = {
   id: string;
   name: string;
   photoUrl?: string;
@@ -15,19 +15,13 @@ export type Restaurant = {
   openNow?: boolean;
 };
 
-export type FavoriteRestaurant = {
-  id: string;
-  name: string;
-  photoUrl?: string;
-  address?: string;
-  lat?: number;
-  lng?: number;
-  phone?: string;
-  rating?: number;
-  openNow?: boolean;
+export type FavoriteRestaurant = RestaurantData;
+
+export type Restaurant = RestaurantData & {
+  isFavorite?: boolean;
 };
 
-export function toFavorite(restaurant: Restaurant): FavoriteRestaurant {
+export function toFavorite(restaurant: RestaurantData): FavoriteRestaurant {
   return {
     id: restaurant.id,
     name: restaurant.name,

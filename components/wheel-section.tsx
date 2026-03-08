@@ -7,17 +7,17 @@ import SubContainer from "@/components/ui/subContainer";
 import Top from "@/components/ui/top";
 
 import { Button } from "@/components/ui/button";
-import type { Restaurant } from "@/types/restaurant";
+import type { RestaurantData } from "@/types/restaurant";
 
 type WheelSectionProps = {
-  items: Restaurant[];
+  items: RestaurantData[];
   selectedIndex: number;
   isSpinning: boolean;
   onSpin: () => void;
   onRandomize: () => void;
   onClear: () => void;
   onRemoveItem: (id: string) => void;
-  onSelect?: (restaurant: Restaurant) => void;
+  onSelect?: (restaurant: RestaurantData) => void;
 };
 
 export function WheelSection({

@@ -4,17 +4,17 @@
 import Container from "@/components/ui/container";
 import SubContainer from "@/components/ui/subContainer";
 
-import type { LatLng, Restaurant } from "@/types/restaurant";
+import type { LatLng, RestaurantData } from "@/types/restaurant";
 import RestaurantMap from "@/components/RestaurantMap";
 
 type MapSectionProps = {
   apiKey: string | undefined;
   location: LatLng | null;
-  restaurants: Restaurant[];
-  extraRestaurant?: Restaurant | null;
-  mapTarget: Restaurant | null;
+  restaurants: RestaurantData[];
+  extraRestaurant?: RestaurantData | null;
+  mapTarget: RestaurantData | null;
   isDark?: boolean;
-  onSelectRestaurant: (restaurant: Restaurant) => void;
+  onSelectRestaurant: (restaurant: RestaurantData) => void;
 };
 
 export function MapSection({

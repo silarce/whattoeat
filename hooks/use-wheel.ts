@@ -1,17 +1,15 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { Restaurant } from "@/types/restaurant";
+import type { RestaurantData } from "@/types/restaurant";
 import { pickRandom } from "@/lib/utils";
-import {
-  MAX_WHEEL_ITEMS,
-} from "@/lib/constants";
+import { MAX_WHEEL_ITEMS } from "@/lib/constants";
 
 type WheelState = {
-  items: Restaurant[];
+  items: RestaurantData[];
   selectedIndex: number;
   isSpinning: boolean;
-  winner: Restaurant | null;
+  winner: RestaurantData | null;
 };
 
 /**
@@ -26,11 +24,11 @@ export function useWheel() {
   });
   const timerRef = useRef<number | null>(null);
   // ref 鏡像，讓 spin() 不需要依賴 state 就能讀到最新項目
-  const itemsRef = useRef<Restaurant[]>([]);
+  const itemsRef = useRef<RestaurantData[]>([]);
   const isSpinningRef = useRef(false);
 
   /** 以隨機選取的餐廳填入轉盤 */
-  const fillRandom = useCallback((restaurants: Restaurant[]) => {
+  const fillRandom = useCallback((restaurants: RestaurantData[]) => {
     const picked = pickRandom(restaurants, MAX_WHEEL_ITEMS);
     itemsRef.current = picked;
     setState({
@@ -43,18 +41,15 @@ export function useWheel() {
   }, []);
 
   /** 手動設定轉盤項目 */
-  const setItems = useCallback((items: Restaurant[]) => {
+  const setItems = useCallback((items: RestaurantData[]) => {
     const next = items.slice(0, MAX_WHEEL_ITEMS);
     itemsRef.current = next;
     setState((prev) => {
       // 找出目前被選中的餐廳 ID
-      const selectedId = prev.selectedIndex >= 0
-        ? prev.items[prev.selectedIndex]?.id
-        : undefined;
+      const selectedId = prev.selectedIndex >= 0 ? prev.items[prev.selectedIndex]?.id : undefined;
       // 在新陣列中尋找同一間餐廳
-      const newSelectedIndex = selectedId !== undefined
-        ? next.findIndex((r) => r.id === selectedId)
-        : -1;
+      const newSelectedIndex =
+        selectedId !== undefined ? next.findIndex((r) => r.id === selectedId) : -1;
       return {
         ...prev,
         items: next,
@@ -66,22 +61,19 @@ export function useWheel() {
   }, []);
 
   /** 加入單一項目到轉盤 */
-  const addItem = useCallback((item: Restaurant) => {
+  const addItem = useCallback((item: RestaurantData) => {
     setState((prev) => {
-      if (
-        prev.items.length >= MAX_WHEEL_ITEMS ||
-        prev.items.some((i) => i.id === item.id)
-      ) {
+      if (prev.items.length >= MAX_WHEEL_ITEMS || prev.items.some((i) => i.id === item.id)) {
         return prev;
       }
       const next = [...prev.items, item];
       itemsRef.current = next;
       return { ...prev, items: next };
     });
-  }, []); 
+  }, []);
 
   /** 直接挑選某餐廳為贏家 (不經轉盤動畫) */
-  const pickDirect = useCallback((restaurant: Restaurant) => {
+  const pickDirect = useCallback((restaurant: RestaurantData) => {
     setState((prev) => {
       const nextIndex = prev.items.findIndex((item) => item.id === restaurant.id);
       return {
@@ -94,7 +86,7 @@ export function useWheel() {
   }, []);
 
   /** 立即選出贏家 (搜尋後自動抽選) */
-  const autoSelect = useCallback((items: Restaurant[]) => {
+  const autoSelect = useCallback((items: RestaurantData[]) => {
     const finalIndex = Math.floor(Math.random() * items.length);
     const selected = items[finalIndex];
     setState((prev) => ({
@@ -118,8 +110,8 @@ export function useWheel() {
     isSpinningRef.current = true;
 
     // --- 在 setState 之外預先計算所有亂數，避免 Strict Mode double-invoke 問題 ---
-    const TICKS = 30;      // 動畫總格數
-    const MIN_DELAY = 55;  // 最快間隔 (ms)
+    const TICKS = 30; // 動畫總格數
+    const MIN_DELAY = 55; // 最快間隔 (ms)
     const MAX_DELAY = 260; // 最慢間隔 (ms)，緩速停止
 
     // 決定最終贏家
@@ -133,7 +125,9 @@ export function useWheel() {
       if (items.length === 1) {
         idx = 0;
       } else {
-        do { idx = Math.floor(Math.random() * items.length); } while (idx === last);
+        do {
+          idx = Math.floor(Math.random() * items.length);
+        } while (idx === last);
       }
       path.push(idx);
       last = idx;

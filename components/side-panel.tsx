@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { RestaurantList } from "@/components/restaurant-list";
 import { FavoritesSection } from "@/components/favorites-section";
-import type { Restaurant, FavoriteRestaurant } from "@/types/restaurant";
+import type { RestaurantData, FavoriteRestaurant } from "@/types/restaurant";
 import type { DistanceBandKey } from "@/lib/constants";
 
 type SidePanelProps = {
@@ -15,7 +15,7 @@ type SidePanelProps = {
 
   restaurantList: {
     totalCount: number;
-    pagedRestaurants: Restaurant[];
+    pagedRestaurants: RestaurantData[];
     page: number;
     totalPages: number;
     onPageChange: (page: number) => void;
@@ -24,8 +24,8 @@ type SidePanelProps = {
     hasLocation: boolean;
     isSearching: boolean;
     onToggleWheel: (id: string) => void;
-    onSelect: (restaurant: Restaurant) => void;
-    onViewOnMap: (restaurant: Restaurant | FavoriteRestaurant) => void;
+    onSelect: (restaurant: RestaurantData) => void;
+    onViewOnMap: (restaurant: RestaurantData | FavoriteRestaurant) => void;
     onBandChange: (band: DistanceBandKey) => void;
   },
   favoriteList: {
