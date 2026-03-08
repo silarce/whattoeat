@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 
-const ModalCloseContext = createContext<() => void>(() => { });
+const ModalCloseContext = createContext<() => void>(() => {});
 
 /** 在 modal 內容元件中呼叫，取得關閉函數 */
 export const useModalClose = () => useContext(ModalCloseContext);
@@ -32,12 +32,8 @@ function ModalShell({
         onClick={onClose}
       />
       {/* Scroll wrapper */}
-      <div className="relative z-10 flex min-h-full items-center justify-center p-4 sm:p-6"
-        onClick={onClose}
-      >
-        <div className="w-full max-w-md">
-          {children}
-        </div>
+      <div className="pointer-events-none relative z-10 flex min-h-full items-center justify-center p-4 sm:p-6">
+        <div className="pointer-events-auto w-full max-w-md">{children}</div>
       </div>
     </div>
   );
@@ -66,9 +62,7 @@ export function showModal(content: ReactNode): Promise<void> {
 
     root.render(
       <ModalCloseContext.Provider value={cleanup}>
-        <ModalShell onClose={cleanup}>
-          {content}
-        </ModalShell>
+        <ModalShell onClose={cleanup}>{content}</ModalShell>
       </ModalCloseContext.Provider>,
     );
   });
