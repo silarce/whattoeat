@@ -22,7 +22,7 @@ export function useFavorites() {
     getFavorites()
       .then(setFavorites)
       .catch(() => {
-        /* 靜默失敗 */
+       alert("取得收藏資料失敗，請確認您使用的是主流瀏覽器且已允許使用 IndexedDB");
       })
       .finally(() => setIsLoading(false));
   }, []);
@@ -56,6 +56,9 @@ export function useFavorites() {
     () => favorites.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
     [favorites, safePage],
   );
+
+
+
 
   return {
     favorites,
