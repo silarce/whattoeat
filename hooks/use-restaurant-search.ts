@@ -6,7 +6,6 @@ import {
   searchAllNearby,
   filterByDistance,
   sortByDistance,
-  createMockRestaurants,
 } from "@/lib/places-api";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS } from "@/lib/constants";
@@ -73,14 +72,15 @@ export function useRestaurantSearch() {
       });
       return { all: results, filtered };
     } catch {
-      const fallback = createMockRestaurants(location.lat, location.lng);
+      alert("google api 不可用，請稍後重試");
+
       setState({
-        allRestaurants: fallback,
-        restaurants: fallback,
+        allRestaurants: [],
+        restaurants: [],
         isSearching: false,
         error: "Google API 暫時不可用，已切換為模擬資料",
       });
-      return { all: fallback, filtered: fallback };
+      return { all: [], filtered: [] };
     }
   }, []);
 
