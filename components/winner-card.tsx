@@ -64,7 +64,7 @@ export function WinnerCard({
           <p className="text-xl sm:text-3xl font-bold text-orange-100 tracking-wide">🎉 今天就吃這家！ <span className="inline-block rotate-y-180">🎉</span></p>
           <button
             onClick={close}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors cursor-pointer"
             aria-label="關閉"
           >
             ✕

@@ -2,7 +2,11 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { LatLng, Restaurant } from "@/types/restaurant";
-import { searchAllNearby, filterByDistance, sortByDistance, createMockRestaurants } from "@/lib/places-api";
+import {
+  searchAllNearby,
+  filterByDistance,
+  sortByDistance,
+} from "@/lib/places-api";
 import type { DistanceBandKey } from "@/lib/constants";
 import { DISTANCE_BANDS } from "@/lib/constants";
 
@@ -32,7 +36,13 @@ export function useRestaurantSearch() {
   const search = useCallback(async (location: LatLng) => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-    setState((prev) => ({ ...prev, allRestaurants: [], restaurants: [], isSearching: true, error: null }));
+    setState((prev) => ({
+      ...prev,
+      allRestaurants: [],
+      restaurants: [],
+      isSearching: true,
+      error: null,
+    }));
 
     try {
       if (!apiKey) throw new Error("MISSING_API_KEY");
@@ -44,21 +54,33 @@ export function useRestaurantSearch() {
       // 預設先用「近」過濾
       const nearBand = DISTANCE_BANDS.find((b) => b.key === "near")!;
       const filtered = sortByDistance(
-        filterByDistance(results, location.lat, location.lng, nearBand.maxMeters),
-        location.lat, location.lng,
+        filterByDistance(
+          results,
+          location.lat,
+          location.lng,
+          nearBand.maxMeters,
+        ),
+        location.lat,
+        location.lng,
       );
 
-      setState({ allRestaurants: results, restaurants: filtered, isSearching: false, error: null });
+      setState({
+        allRestaurants: results,
+        restaurants: filtered,
+        isSearching: false,
+        error: null,
+      });
       return { all: results, filtered };
     } catch {
-      const fallback = createMockRestaurants(location.lat, location.lng);
+      alert("google api 不可用，請稍後重試");
+
       setState({
-        allRestaurants: fallback,
-        restaurants: fallback,
+        allRestaurants: [],
+        restaurants: [],
         isSearching: false,
         error: "Google API 暫時不可用，已切換為模擬資料",
       });
-      return { all: fallback, filtered: fallback };
+      return { all: [], filtered: [] };
     }
   }, []);
 
@@ -67,8 +89,14 @@ export function useRestaurantSearch() {
     setState((prev) => {
       const bandDef = DISTANCE_BANDS.find((b) => b.key === band)!;
       const filtered = sortByDistance(
-        filterByDistance(prev.allRestaurants, location.lat, location.lng, bandDef.maxMeters),
-        location.lat, location.lng,
+        filterByDistance(
+          prev.allRestaurants,
+          location.lat,
+          location.lng,
+          bandDef.maxMeters,
+        ),
+        location.lat,
+        location.lng,
       );
       return { ...prev, restaurants: filtered };
     });
@@ -82,7 +110,8 @@ export function useRestaurantSearch() {
   const safePage = page >= totalPages ? 0 : page;
 
   const pagedRestaurants = useMemo(
-    () => state.restaurants.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
+    () =>
+      state.restaurants.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE),
     [state.restaurants, safePage],
   );
 

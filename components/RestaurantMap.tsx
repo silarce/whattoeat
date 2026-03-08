@@ -20,7 +20,7 @@ const LABEL_HIDE_ZOOM = 20;
 // 點擊 marker / 選取餐廳時，地圖縮放到的目標 zoom（街道等級）
 const RESTAURANT_FOCUS_ZOOM = 17;
 const MARKER_DEFAULT_COLOR = "#e18646";
-const MARKER_WINNER_COLOR  = "#ef4444";
+const MARKER_WINNER_COLOR = "#ef4444";
 
 const makePinHtml = makePinSvg;
 

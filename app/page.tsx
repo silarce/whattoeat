@@ -1,19 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { useTheme } from "next-themes";
+import { useMediaQuery } from "usehooks-ts";
+
 import type { FavoriteRestaurant, Restaurant } from "@/types/restaurant";
-import type { DistanceBandKey } from "@/lib/constants";
+
 import { DISTANCE_BANDS, MAX_WHEEL_ITEMS } from "@/lib/constants";
+import type { DistanceBandKey } from "@/lib/constants";
 import { filterByDistance } from "@/lib/places-api";
+import { showModal } from "@/lib/show-modal";
+
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { useRestaurantSearch } from "@/hooks/use-restaurant-search";
 import { useWheel } from "@/hooks/use-wheel";
 import { useFavorites } from "@/hooks/use-favorites";
+
 import { Header } from "@/components/header";
 import { WheelSection } from "@/components/wheel-section";
 import { WinnerCard } from "@/components/winner-card";
-import { showModal } from "@/lib/show-modal";
 import { MapSection } from "@/components/map-section";
 import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
@@ -21,7 +27,8 @@ import { LocationPermissionModal } from "@/components/location-permission-modal"
 import { GpsOffModal } from "@/components/gps-off-modal";
 import { showUsageGuide, showUsageGuideIfNeeded } from "@/components/usage-guide-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { useMediaQuery } from "usehooks-ts";
+
+const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export default function Home() {
   // region  --- Hooks ---
@@ -32,41 +39,16 @@ export default function Home() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
+  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
+
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
   const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("near");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
 
-  // 掛載後自動定位
-  useEffect(() => {
-    geo.locate();
-    // 首次進入檢查是否顯示使用說明
-    showUsageGuideIfNeeded();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  // 定位成功時重新搜尋（涵蓋首次載入與重新定位後移動的情況）
-  useEffect(() => {
-    if (!geo.location || searchHook.isSearching) return;
-    const location = geo.location;
-    // 重置上一次的選擇狀態
-    setMapTarget(null);
-    setExtraMapRestaurant(null);
-    wheel.clearSelection();
-    setManualWheelIds([]);
-    (async () => {
-      const { filtered } = await searchHook.search(location);
-      if (filtered.length === 0) return;
-      const picked = wheel.fillRandom(filtered);
-      setManualWheelIds(picked.map((r) => r.id));
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geo.location]);
-
-  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   // --- Handlers ---
   const handleLocate = useCallback(() => {
@@ -188,6 +170,38 @@ export default function Home() {
     setMapTarget(restaurant as Restaurant);
   }, []);
 
+
+  // 掛載後自動定位
+  useEffect(() => {
+    geo.locate();
+    // 首次進入檢查是否顯示使用說明
+    showUsageGuideIfNeeded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 定位成功時重新搜尋（涵蓋首次載入與重新定位後移動的情況）
+  useEffect(() => {
+    if (!geo.location || searchHook.isSearching) return;
+    const location = geo.location;
+    // 重置上一次的選擇狀態
+    setMapTarget(null);
+    setExtraMapRestaurant(null);
+    wheel.clearSelection();
+    setManualWheelIds([]);
+    (async () => {
+      const { filtered } = await searchHook.search(location);
+      if (filtered.length === 0) return;
+      const picked = wheel.fillRandom(filtered);
+      setManualWheelIds(picked.map((r) => r.id));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.location]);
+
+
+
+
+
+
   // 偵測轉盤從「旋轉中」→「停止且有贏家」的時機，呼叫 handleSelectRestaurant
   const prevIsSpinningRef = useRef(false);
   useEffect(() => {
@@ -198,10 +212,37 @@ export default function Home() {
     }
   }, [wheel.isSpinning, wheel.winner, handleSelectRestaurant]);
 
+  // region --- Render ---
 
+  const sidePanel = <SidePanel
+    manualWheelIds={manualWheelIds}
+    restaurantList={{
+      totalCount: searchHook.restaurants.length,
+      pagedRestaurants: searchHook.pagedRestaurants,
+      page: searchHook.page,
+      totalPages: searchHook.totalPages,
+      onPageChange: searchHook.setPage,
+      favoriteIds: favs.favorites.map((f) => f.id),
+      band: band,
+      hasLocation: !!geo.location,
+      isSearching: searchHook.isSearching,
+      onToggleWheel: handleToggleWheel,
+      onSelect: handleSelectRestaurant,
+      onViewOnMap: handleViewOnMap,
+      onBandChange: handleBandChange,
+    }}
+    favoriteList={{
+      favorites: favs.favorites,
+      pagedFavorites: favs.pagedFavorites,
+      favPage: favs.page,
+      favTotalPages: favs.totalPages,
+      onFavPageChange: favs.setPage,
+      onToggleFavWheel: handleToggleWheel,
+      onSelectFav: (fav) => handleSelectRestaurant(fav as Restaurant),
+      onRemoveFavorite: favs.remove,
+    }}
+  />
 
-
-// region --- Render ---
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 overflow-x-hidden">
@@ -238,6 +279,7 @@ export default function Home() {
 
         {/* Main 2-column layout */}
         <div className="grid gap-6 lg:grid-cols-5">
+          {/* left */}
           <div className="min-w-0 space-y-6 lg:col-span-3">
             <WheelSection
               items={wheel.items}
@@ -261,63 +303,21 @@ export default function Home() {
             />
           </div>
 
+          {/* right */}
           {isDesktop && (
             <div className="min-w-0 lg:col-span-2 h-0 min-h-full">
-              <SidePanel
-                totalCount={searchHook.restaurants.length}
-                pagedRestaurants={searchHook.pagedRestaurants}
-                page={searchHook.page}
-                totalPages={searchHook.totalPages}
-                onPageChange={searchHook.setPage}
-                manualWheelIds={manualWheelIds}
-                favoriteIds={favs.favorites.map((f) => f.id)}
-                band={band}
-                hasLocation={!!geo.location}
-                isSearching={searchHook.isSearching}
-                onToggleWheel={handleToggleWheel}
-                onSelect={handleSelectRestaurant}
-                onViewOnMap={handleViewOnMap}
-                onBandChange={handleBandChange}
-                favorites={favs.favorites}
-                pagedFavorites={favs.pagedFavorites}
-                favPage={favs.page}
-                favTotalPages={favs.totalPages}
-                onFavPageChange={favs.setPage}
-                onToggleFavWheel={handleToggleWheel}
-                onSelectFav={(fav) => handleSelectRestaurant(fav as Restaurant)}
-                onRemoveFavorite={favs.remove}
-              />
+              {sidePanel}
             </div>
           )}
         </div>
 
         {/* Mobile / Tablet Drawer */}
         {!isDesktop && (
-          <Drawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)}>
-            <SidePanel
-              totalCount={searchHook.restaurants.length}
-              pagedRestaurants={searchHook.pagedRestaurants}
-              page={searchHook.page}
-              totalPages={searchHook.totalPages}
-              onPageChange={searchHook.setPage}
-              manualWheelIds={manualWheelIds}
-              favoriteIds={favs.favorites.map((f) => f.id)}
-              band={band}
-              hasLocation={!!geo.location}
-              isSearching={searchHook.isSearching}
-              onToggleWheel={handleToggleWheel}
-              onSelect={(r) => { handleSelectRestaurant(r); setDrawerOpen(false); }}
-              onViewOnMap={(r) => { handleViewOnMap(r); setDrawerOpen(false); }}
-              onBandChange={handleBandChange}
-              favorites={favs.favorites}
-              pagedFavorites={favs.pagedFavorites}
-              favPage={favs.page}
-              favTotalPages={favs.totalPages}
-              onFavPageChange={favs.setPage}
-              onToggleFavWheel={handleToggleWheel}
-              onSelectFav={(fav) => { handleSelectRestaurant(fav as Restaurant); setDrawerOpen(false); }}
-              onRemoveFavorite={favs.remove}
-            />
+          <Drawer
+            isOpen={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+            title="📋 餐廳列表"          >
+            {sidePanel}
           </Drawer>
         )}
       </main>

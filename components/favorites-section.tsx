@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { cn } from "@/lib/utils";
-import { CardBody } from "@/components/ui/card";
+import SubContainer from "@/components/ui/subContainer";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import type { FavoriteRestaurant } from "@/types/restaurant";
@@ -40,7 +40,7 @@ export function FavoritesSection({
   };
 
   return (
-    <CardBody className="flex-1 min-h-0 pb-0 flex flex-col">
+    <SubContainer className="flex-1 min-h-0 pb-0 flex flex-col">
       {favorites.length === 0 ? (
         <div className="flex h-32 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-500 dark:text-gray-400">選好餐廳後點「加入收藏」即可保存</p>
@@ -113,6 +113,6 @@ export function FavoritesSection({
           <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />
         </>
       )}
-    </CardBody>
+    </SubContainer>
   );
 }

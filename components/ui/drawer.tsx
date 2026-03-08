@@ -8,9 +8,10 @@ type DrawerProps = {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  title?: string;
 };
 
-export function Drawer({ isOpen, onClose, children }: DrawerProps) {
+export function Drawer({ isOpen, onClose, title, children }: DrawerProps) {
   // Escape 鍵關閉
   useEffect(() => {
     if (!isOpen) return;
@@ -54,7 +55,7 @@ export function Drawer({ isOpen, onClose, children }: DrawerProps) {
       >
         {/* 關閉按鈕 */}
         <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
-          <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">📋 餐廳列表</span>
+          <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</span>
           <button
             onClick={onClose}
             className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors dark:text-gray-400 dark:hover:bg-gray-800"

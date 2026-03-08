@@ -4,6 +4,7 @@ import {
   PLACES_FIELD_MASK,
   API_SEARCH_RADIUS,
 } from "@/lib/constants";
+import type { Place } from "@/types/place";
 
 // ---------------------------------------------------------------------------
 //  Haversine
@@ -27,47 +28,20 @@ export function distanceInMeters(
 }
 
 // ---------------------------------------------------------------------------
-//  API Types
-// ---------------------------------------------------------------------------
-
-type PlaceResponse = {
-  places?: Array<{
-    id?: string;
-    displayName?: { text?: string };
-    formattedAddress?: string;
-    photos?: Array<{ name: string }>;
-    location?: { latitude?: number; longitude?: number };
-    nationalPhoneNumber?: string;
-    rating?: number;
-    currentOpeningHours?: { openNow?: boolean };
-  }>;
-  nextPageToken?: string;
-};
-
-// ---------------------------------------------------------------------------
 //  Internal helpers
 // ---------------------------------------------------------------------------
 
-function parsePlaces(
-  places: NonNullable<PlaceResponse["places"]>,
-  apiKey: string,
-): Restaurant[] {
+function parsePlaces(places: Place[]): Restaurant[] {
   return places
     .filter((place) => place.id && place.displayName?.text)
     .map((place) => {
-      const firstPhotoName = place.photos?.[0]?.name;
-      const photoUrl = firstPhotoName
-        ? `https://places.googleapis.com/v1/${firstPhotoName}/media?maxHeightPx=240&maxWidthPx=240&key=${apiKey}`
-        : undefined;
-
       return {
-        id: place.id as string,
-        name: place.displayName?.text as string,
+        id: place.id!,
+        name: place.displayName?.text ?? "",
         address: place.formattedAddress,
-        photoUrl,
+        phone: place.nationalPhoneNumber,
         lat: place.location?.latitude,
         lng: place.location?.longitude,
-        phone: place.nationalPhoneNumber,
         rating: place.rating,
         openNow: place.currentOpeningHours?.openNow,
       } satisfies Restaurant;
@@ -126,12 +100,14 @@ async function searchByTypes(
   });
 
   if (!response.ok) {
-    console.warn(`Failed to searchNearby [${types.join(", ")}]: ${response.status}`);
+    console.warn(
+      `Failed to searchNearby [${types.join(", ")}]: ${response.status}`,
+    );
     return [];
   }
 
-  const data = (await response.json()) as PlaceResponse;
-  return parsePlaces(data.places ?? [], apiKey);
+  const data = (await response.json()) as { places: Place[] };
+  return parsePlaces(data.places ?? []);
 }
 
 // ---------------------------------------------------------------------------
@@ -196,27 +172,5 @@ export function sortByDistance(
         ? distanceInMeters(lat, lng, b.lat, b.lng)
         : Infinity;
     return da - db;
-  });
-}
-
-/**
- * 產生模擬餐廳資料 (API 不可用時的 fallback)
- */
-export function createMockRestaurants(
-  lat: number,
-  lng: number,
-  count = 12,
-): Restaurant[] {
-  // 使用確定性偏移（基於 index），確保每次產生相同的座標與距離
-  return Array.from({ length: count }).map((_, index) => {
-    const angle = (index / count) * 2 * Math.PI;
-    const radiusDeg = 0.0004 * ((index % 2) + 1); // 約 45m / 90m（近）與 180m / 360m（遠），都在 400m 內
-    return {
-      id: `mock-${index + 1}`,
-      name: `附近餐廳 ${index + 1}`,
-      address: `模擬地址 ${index + 1}`,
-      lat: lat + radiusDeg * Math.cos(angle),
-      lng: lng + radiusDeg * Math.sin(angle),
-    };
   });
 }
