@@ -1,6 +1,6 @@
 /** 距離帶定義 */
 export const DISTANCE_BANDS = [
-  { key: "near", label: "近", maxMeters: 100 },
+  { key: "near", label: "近", maxMeters: 200 },
   { key: "far", label: "遠", maxMeters: 400 },
 ] as const;
 
