@@ -25,7 +25,10 @@ import { SidePanel } from "@/components/side-panel";
 import { Drawer } from "@/components/ui/drawer";
 import { LocationPermissionModal } from "@/components/location-permission-modal";
 import { GpsOffModal } from "@/components/gps-off-modal";
-import { showUsageGuide, showUsageGuideIfNeeded } from "@/components/usage-guide-modal";
+import {
+  showUsageGuide,
+  showUsageGuideIfNeeded,
+} from "@/components/usage-guide-modal";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -39,16 +42,17 @@ export default function Home() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
-  const isDesktop = useMediaQuery("(min-width: 1024px)", { initializeWithValue: false });
+  const isDesktop = useMediaQuery("(min-width: 1024px)", {
+    initializeWithValue: false,
+  });
 
   // region --- Local state ---
   const [manualWheelIds, setManualWheelIds] = useState<string[]>([]);
   const [mapTarget, setMapTarget] = useState<Restaurant | null>(null);
-  const [extraMapRestaurant, setExtraMapRestaurant] = useState<Restaurant | null>(null);
-  const [band, setBand] = useState<DistanceBandKey>("near");
+  const [extraMapRestaurant, setExtraMapRestaurant] =
+    useState<Restaurant | null>(null);
+  const [band, setBand] = useState<DistanceBandKey>("far");
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-
 
   // --- Handlers ---
   const handleLocate = useCallback(() => {
@@ -73,7 +77,12 @@ export default function Home() {
         (async () => {
           const { all } = await searchHook.search(location);
           searchHook.applyBand(newBand, location);
-          const filtered = filterByDistance(all, location.lat, location.lng, bandDef.maxMeters);
+          const filtered = filterByDistance(
+            all,
+            location.lat,
+            location.lng,
+            bandDef.maxMeters,
+          );
           if (filtered.length > 0) {
             const picked = wheel.fillRandom(filtered);
             setManualWheelIds(picked.map((r) => r.id));
@@ -166,10 +175,12 @@ export default function Home() {
     [wheel, favs, searchHook.restaurants],
   );
 
-  const handleViewOnMap = useCallback((restaurant: Restaurant | FavoriteRestaurant) => {
-    setMapTarget(restaurant as Restaurant);
-  }, []);
-
+  const handleViewOnMap = useCallback(
+    (restaurant: Restaurant | FavoriteRestaurant) => {
+      setMapTarget(restaurant as Restaurant);
+    },
+    [],
+  );
 
   // 掛載後自動定位
   useEffect(() => {
@@ -197,11 +208,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo.location]);
 
-
-
-
-
-
   // 偵測轉盤從「旋轉中」→「停止且有贏家」的時機，呼叫 handleSelectRestaurant
   const prevIsSpinningRef = useRef(false);
   useEffect(() => {
@@ -214,39 +220,44 @@ export default function Home() {
 
   // region --- Render ---
 
-  const sidePanel = <SidePanel
-    manualWheelIds={manualWheelIds}
-    restaurantList={{
-      totalCount: searchHook.restaurants.length,
-      pagedRestaurants: searchHook.pagedRestaurants,
-      page: searchHook.page,
-      totalPages: searchHook.totalPages,
-      onPageChange: searchHook.setPage,
-      favoriteIds: favs.favorites.map((f) => f.id),
-      band: band,
-      hasLocation: !!geo.location,
-      isSearching: searchHook.isSearching,
-      onToggleWheel: handleToggleWheel,
-      onSelect: handleSelectRestaurant,
-      onViewOnMap: handleViewOnMap,
-      onBandChange: handleBandChange,
-    }}
-    favoriteList={{
-      favorites: favs.favorites,
-      pagedFavorites: favs.pagedFavorites,
-      favPage: favs.page,
-      favTotalPages: favs.totalPages,
-      onFavPageChange: favs.setPage,
-      onToggleFavWheel: handleToggleWheel,
-      onSelectFav: (fav) => handleSelectRestaurant(fav as Restaurant),
-      onRemoveFavorite: favs.remove,
-    }}
-  />
-
+  const sidePanel = (
+    <SidePanel
+      manualWheelIds={manualWheelIds}
+      restaurantList={{
+        totalCount: searchHook.restaurants.length,
+        pagedRestaurants: searchHook.pagedRestaurants,
+        page: searchHook.page,
+        totalPages: searchHook.totalPages,
+        onPageChange: searchHook.setPage,
+        favoriteIds: favs.favorites.map((f) => f.id),
+        band: band,
+        hasLocation: !!geo.location,
+        isSearching: searchHook.isSearching,
+        onToggleWheel: handleToggleWheel,
+        onSelect: handleSelectRestaurant,
+        onViewOnMap: handleViewOnMap,
+        onBandChange: handleBandChange,
+      }}
+      favoriteList={{
+        favorites: favs.favorites,
+        pagedFavorites: favs.pagedFavorites,
+        favPage: favs.page,
+        favTotalPages: favs.totalPages,
+        onFavPageChange: favs.setPage,
+        onToggleFavWheel: handleToggleWheel,
+        onSelectFav: (fav) => handleSelectRestaurant(fav as Restaurant),
+        onRemoveFavorite: favs.remove,
+      }}
+    />
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 overflow-x-hidden">
-      <LoadingOverlay isLoading={geo.isLocating} message="正在定位中…" fullscreen />
+    <div className="min-h-screen overflow-x-hidden bg-gray-50 dark:bg-gray-950">
+      <LoadingOverlay
+        isLoading={geo.isLocating}
+        message="正在定位中…"
+        fullscreen
+      />
       <Header
         isLocating={geo.isLocating}
         onLocate={handleLocate}
@@ -255,7 +266,7 @@ export default function Home() {
         restaurantCount={searchHook.restaurants.length}
       />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 overflow-hidden">
+      <main className="mx-auto max-w-6xl space-y-6 overflow-hidden px-4 py-6 sm:px-6">
         {/* Location Permission Modal */}
         <LocationPermissionModal
           isOpen={geo.permissionDenied}
@@ -264,10 +275,7 @@ export default function Home() {
         />
 
         {/* GPS Off Modal — 行動裝置且精度極差時顯示 */}
-        <GpsOffModal
-          isOpen={geo.gpsOff}
-          onClose={geo.clearGpsOff}
-        />
+        <GpsOffModal isOpen={geo.gpsOff} onClose={geo.clearGpsOff} />
 
         {/* 定位精度警告 */}
         {geo.accuracyWarning && (
@@ -305,7 +313,7 @@ export default function Home() {
 
           {/* right */}
           {isDesktop && (
-            <div className="min-w-0 lg:col-span-2 h-0 min-h-full">
+            <div className="h-0 min-h-full min-w-0 lg:col-span-2">
               {sidePanel}
             </div>
           )}
@@ -316,7 +324,8 @@ export default function Home() {
           <Drawer
             isOpen={drawerOpen}
             onClose={() => setDrawerOpen(false)}
-            title="📋 餐廳列表"          >
+            title="📋 餐廳列表"
+          >
             {sidePanel}
           </Drawer>
         )}

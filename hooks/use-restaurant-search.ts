@@ -51,8 +51,8 @@ export function useRestaurantSearch() {
 
       if (results.length === 0) throw new Error("EMPTY_RESULTS");
 
-      // 預設先用「近」過濾
-      const nearBand = DISTANCE_BANDS.find((b) => b.key === "near")!;
+      // 預設先用「遠」過濾
+      const nearBand = DISTANCE_BANDS.find((b) => b.key === "far")!;
       const filtered = sortByDistance(
         filterByDistance(
           results,
