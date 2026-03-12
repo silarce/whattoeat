@@ -53,6 +53,7 @@ export default function Home() {
     useState<Restaurant | null>(null);
   const [band, setBand] = useState<DistanceBandKey>("far");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   // --- Handlers ---
   const handleLocate = useCallback(() => {
@@ -157,6 +158,15 @@ export default function Home() {
     (restaurant: Restaurant) => {
       wheel.pickDirect(restaurant);
       setMapTarget(restaurant);
+      setDrawerOpen(false);
+      setTimeout(
+        () =>
+          mapRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          }),
+        100,
+      );
       // 若餐廳不在目前搜尋清單中，將其記為額外地圖標記點
       if (!searchHook.restaurants.some((r) => r.id === restaurant.id)) {
         setExtraMapRestaurant(restaurant);
@@ -178,6 +188,15 @@ export default function Home() {
   const handleViewOnMap = useCallback(
     (restaurant: Restaurant | FavoriteRestaurant) => {
       setMapTarget(restaurant as Restaurant);
+      setDrawerOpen(false);
+      setTimeout(
+        () =>
+          mapRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          }),
+        100,
+      );
     },
     [],
   );
@@ -300,15 +319,17 @@ export default function Home() {
               onSelect={handleSelectRestaurant}
             />
 
-            <MapSection
-              apiKey={googleMapsApiKey}
-              location={geo.location}
-              restaurants={searchHook.restaurants}
-              extraRestaurant={extraMapRestaurant}
-              mapTarget={mapTarget}
-              isDark={isDark}
-              onSelectRestaurant={handleSelectRestaurant}
-            />
+            <div ref={mapRef}>
+              <MapSection
+                apiKey={googleMapsApiKey}
+                location={geo.location}
+                restaurants={searchHook.restaurants}
+                extraRestaurant={extraMapRestaurant}
+                mapTarget={mapTarget}
+                isDark={isDark}
+                onSelectRestaurant={handleSelectRestaurant}
+              />
+            </div>
           </div>
 
           {/* right */}
