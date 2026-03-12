@@ -24,6 +24,8 @@ function isMobileDevice(): boolean {
 
 /**
  * 封裝瀏覽器 Geolocation API 的 hook
+ *
+ * 用來定位
  */
 export function useGeolocation() {
   const [state, setState] = useState<GeolocationState>({
@@ -46,7 +48,14 @@ export function useGeolocation() {
       return;
     }
 
-    setState((prev) => ({ ...prev, isLocating: true, error: null, accuracyWarning: null, permissionDenied: false, gpsOff: false }));
+    setState((prev) => ({
+      ...prev,
+      isLocating: true,
+      error: null,
+      accuracyWarning: null,
+      permissionDenied: false,
+      gpsOff: false,
+    }));
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -64,9 +73,10 @@ export function useGeolocation() {
           error: null,
           // 精度誤差半徑超過 150m（常見於純 Wi-Fi / 網路定位），距離帶結果僅供參考
           // 若已顯示 GPS 提示 modal 則不顕示重複的 yellow banner
-          accuracyWarning: !gpsOff && accuracy > 150
-            ? `定位精度偏低（誤差約 ${Math.round(accuracy)} 公尺），附近餐廳距離僅供參考`
-            : null,
+          accuracyWarning:
+            !gpsOff && accuracy > 150
+              ? `定位精度偏低（誤差約 ${Math.round(accuracy)} 公尺），附近餐廳距離僅供參考`
+              : null,
           permissionDenied: false,
           gpsOff,
         });
